@@ -12,6 +12,7 @@
     <!-- Illustrations Container -->
 
     <!-- Welcome Text -->
+
     <ImageView
         android:id="@+id/illustrationsContainer"
         android:layout_width="wrap_content"
