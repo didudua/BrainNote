@@ -7,4 +7,24 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#4285F4</color>
+
+    <!-- Google Colors -->
+    <color name="googleBlue">#4285F4</color>
+    <color name="googleRed">#EB4335</color>
+    <color name="googleYellow">#FBBC05</color>
+    <color name="googleGreen">#34A853</color>
+
+    <!-- Note Colors -->
+    <color name="noteBlue">#7FDBEC</color>
+    <color name="notePink">#FF9DAD</color>
+    <color name="noteYellow">#FBBC05</color>
+    <color name="noteBrown">#B07F7F</color>
+    <color name="noteGreen">#9AE66E</color>
+
+    <!-- UI Colors -->
+    <color name="textGray">#909090</color>
+    <color name="dividerGray">#D7D7D7</color>
 </resources>
