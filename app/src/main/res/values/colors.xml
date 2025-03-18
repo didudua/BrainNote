@@ -26,5 +26,6 @@
 
     <!-- UI Colors -->
     <color name="textGray">#909090</color>
+    <color name="rippleColor">#1F000000</color>
     <color name="dividerGray">#D7D7D7</color>
 </resources>

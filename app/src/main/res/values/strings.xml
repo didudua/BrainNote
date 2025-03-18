@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Brain Note</string>
-    <string name="welcome_text">Chào mừng đến với Brain Note</string>
-    <string name="main_title">Công việc, học tập, nhiệm vụ. Ghi nhớ mọi thứ</string>
-    <string name="continue_with_google">Tiếp tục với Google</string>
-    <string name="or">hoặc</string>
-    <string name="create_account">Tạo tài khoản</string>
-    <string name="sign_in">Đăng nhập</string>
+    <string name="app_name" translatable="false">Brain Note</string>
+    <string name="welcome_text" translatable="false">Chào mừng đến với Brain Note</string>
+    <string name="main_title" translatable="false">Công việc, học tập, nhiệm vụ. Ghi nhớ mọi thứ</string>
+    <string name="continue_with_google" translatable="false">Tiếp tục với Google</string>
+    <string name="or" translatable="false">hoặc</string>
+    <string name="create_account" translatable="false">Tạo tài khoản</string>
+    <string name="sign_in" translatable="false">Đăng nhập</string>
 </resources>
