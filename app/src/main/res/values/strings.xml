@@ -6,4 +6,6 @@
     <string name="or" translatable="false">hoặc</string>
     <string name="create_account" translatable="false">Tạo tài khoản</string>
     <string name="sign_in" translatable="false">Đăng nhập</string>
+    <string name="default_web_client_id">942344742128-ci83il9l08mud0uh0fmtnjgq4c3plj5a.apps.googleusercontent.com</string>
+
 </resources>

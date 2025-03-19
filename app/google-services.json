@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "942344742128",
+    "project_id": "brainnote-b063b",
+    "storage_bucket": "brainnote-b063b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942344742128:android:495571a80c3d3a8ad24e35",
+        "android_client_info": {
+          "package_name": "Lop48K14_1.group2.brainnote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "942344742128-jffkus88j92a1gmma6iqit3fj3gj7vmk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "Lop48K14_1.group2.brainnote",
+            "certificate_hash": "101ae1f5d81d476d618f1ccbc6e65661323e8336"
+          }
+        },
+        {
+          "client_id": "942344742128-ci83il9l08mud0uh0fmtnjgq4c3plj5a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbXxfovO1WqD6Lq4Z3naepmvvRKBaNETw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "942344742128-ci83il9l08mud0uh0fmtnjgq4c3plj5a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
