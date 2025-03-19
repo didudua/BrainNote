@@ -1,4 +1,4 @@
-package Lop48K14_1.group2.brainnote.Login;
+package Lop48K14_1.group2.brainnote.ui.Login;
 
 import android.os.Bundle;
 import android.view.View;
