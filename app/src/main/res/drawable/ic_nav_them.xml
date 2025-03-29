@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Foreground: dùng inset để thu nhỏ ảnh bằng cách thêm khoảng trống -->
+    <foreground>
+        <inset
+            android:drawable="@drawable/icon_nav_add"/>
+    </foreground>
+</adaptive-icon>
