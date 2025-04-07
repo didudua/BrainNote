@@ -111,11 +111,34 @@ public class LoginPasswordFragment extends Fragment {
             }
         });
         continueButton.setOnClickListener(v -> {
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if(!login){
-                ((MainActivity) requireActivity()).loadFragment(new LoginFragment());
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
+                                ((MainActivity) requireActivity()).loadFragment(new LoginFragment());
+                            } else {
+                                Toast.makeText(getContext(), "Không thể tạo tài khoản: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
             }
             else{
-                ((MainActivity) requireActivity()).loadFragment(new HomeFragment());
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                ((MainActivity) requireActivity()).loadFragment(new HomeFragment());
+                            } else {
+                                Toast.makeText(getContext(), "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
