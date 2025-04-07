@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_create"
+        android:title="Tạo"
+        android:icon="@drawable/icon_nav_add" />
+    <item
+        android:id="@+id/nav_notes"
+        android:title="Ghi chú"
+        android:icon="@drawable/icon_nav_note" />
+    <item
+        android:id="@+id/nav_notebooks"
+        android:title="Sổ tay"
+        android:icon="@drawable/icon_nav_notebook" />
+    <item
+        android:id="@+id/nav_tasks"
+        android:title="Nhiệm vụ"
+        android:icon="@drawable/icon_nav_task" />
+</menu>

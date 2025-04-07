@@ -30,6 +30,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.Home.HomeFragment;
+import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
 
 
 public class LoginFragment extends Fragment {
@@ -150,7 +151,7 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
 
                         // Chuyển sang MainActivity
-                        ((MainActivity) requireActivity()).loadFragment(new HomeFragment());
+                        ((MainActivity) requireActivity()).loadFragment(new MainHomeActivity());
                     } else {
                         Toast.makeText(getContext(), "Xác thực Firebase thất bại", Toast.LENGTH_SHORT).show();
                     }
