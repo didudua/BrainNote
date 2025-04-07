@@ -151,7 +151,9 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
 
                         // Chuyển sang MainActivity
-                        ((MainActivity) requireActivity()).loadFragment(new MainHomeActivity());
+                        Intent intent = new Intent(getActivity(), MainHomeActivity.class);
+                        startActivity(intent);
+
                     } else {
                         Toast.makeText(getContext(), "Xác thực Firebase thất bại", Toast.LENGTH_SHORT).show();
                     }
