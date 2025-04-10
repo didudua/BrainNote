@@ -25,7 +25,7 @@ public class MainHomeActivity extends AppCompatActivity {
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
-
+    //oce
         NavigationUI.setupWithNavController(navView, navController);
     }
 }
