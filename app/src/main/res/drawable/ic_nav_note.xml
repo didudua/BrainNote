@@ -3,10 +3,6 @@
     <!-- Foreground: dùng inset để thu nhỏ ảnh bằng cách thêm khoảng trống -->
     <foreground>
         <inset
-            android:drawable="@drawable/img_logo"
-            android:insetLeft="15dp"
-            android:insetTop="15dp"
-            android:insetRight="15dp"
-            android:insetBottom="15dp"/>
+            android:drawable="@drawable/icon_nav_note"/>
     </foreground>
 </adaptive-icon>

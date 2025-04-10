@@ -7,15 +7,22 @@
     android:background="@android:color/white"
     tools:context=".MainActivity">
 
+    <!-- Status Bar -->
+
+    <!-- Illustrations Container -->
+
+    <!-- Welcome Text -->
+
     <ImageView
         android:id="@+id/illustrationsContainer"
         android:layout_width="wrap_content"
         android:layout_height="400dp"
+        android:layout_marginTop="50dp"
         android:src="@drawable/img_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="0dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/welcomeText"
