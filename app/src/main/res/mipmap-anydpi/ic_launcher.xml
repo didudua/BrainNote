@@ -4,9 +4,9 @@
     <foreground>
         <inset
             android:drawable="@drawable/img_logo"
-            android:insetLeft="15dp"
-            android:insetTop="15dp"
-            android:insetRight="15dp"
-            android:insetBottom="15dp"/>
+            android:insetLeft="6dp"
+            android:insetTop="6dp"
+            android:insetRight="6dp"
+            android:insetBottom="6dp"/>
     </foreground>
 </adaptive-icon>
