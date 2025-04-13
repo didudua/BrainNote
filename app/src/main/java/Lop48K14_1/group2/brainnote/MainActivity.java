@@ -38,11 +38,6 @@ public class MainActivity extends AppCompatActivity {
                 loadFragment(new WelcomeFragment());
             }
         }
-
-//        // Start with the welcome fragment
-//        if (savedInstanceState == null) {
-//            loadFragment(new WelcomeFragment());
-//        }
     }
 
     public void loadFragment(Fragment fragment) {
