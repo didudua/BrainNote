@@ -35,15 +35,12 @@
         <!-- Thanh tìm kiếm -->
         <EditText
             android:id="@+id/searchEditText"
-            android:layout_width="323dp"
-            android:layout_height="29dp"
-            android:layout_marginBottom="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/search_background"
-            android:clickable="true"
-            android:focusable="false"
-            android:hint="Tìm bất kỳ ghi chú, công việc, hoặc tài liệu..."
-            android:padding="4dp"
-            android:textSize="15sp" />
+            android:hint="Tìm bất kỳ ghi chú,..."
+            android:padding="8dp"
+            android:singleLine="true" />
 
         <!-- Grid các card -->
         <GridLayout
@@ -73,8 +70,10 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/textView2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
                         android:text="+"
                         android:textColor="@android:color/white"
                         android:textSize="24sp" />
@@ -83,6 +82,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginBottom="118dp"
+                        android:layout_toEndOf="@+id/textView2"
                         android:text="Ghi chú mới"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
@@ -93,7 +95,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:alpha="0.7"
-                        android:src="@drawable/ic_note"
+                        android:src="@drawable/icon_home_note"
                         app:tint="@android:color/white" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
@@ -116,6 +118,7 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/textView3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+"
@@ -126,6 +129,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginBottom="118dp"
+                        android:layout_toEndOf="@+id/textView3"
                         android:text="Nhiệm vụ mới"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
@@ -136,7 +142,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:alpha="0.7"
-                        android:src="@drawable/ic_task"
+                        android:src="@drawable/icon_home_task"
                         app:tint="@android:color/white" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
@@ -159,6 +165,7 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/textView4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+"
@@ -169,6 +176,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginBottom="118dp"
+                        android:layout_toEndOf="@+id/textView4"
                         android:text="Sổ tay mới"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
@@ -179,7 +189,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:alpha="0.7"
-
+                        android:background="@drawable/icon_home_notebook"
                         app:tint="@android:color/white" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
