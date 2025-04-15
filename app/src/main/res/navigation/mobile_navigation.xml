@@ -21,10 +21,19 @@
         android:id="@+id/nav_notebooks"
         android:name="Lop48K14_1.group2.brainnote.ui.Home.NotebooksFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_notebooks" />
+        tools:layout="@layout/fragment_notebooks" >
+        <action
+            android:id="@+id/action_nav_notebooks_to_new_NoteBook"
+            app:destination="@id/new_NoteBook" />
+    </fragment>
     <fragment
         android:id="@+id/nav_tasks"
         android:name="Lop48K14_1.group2.brainnote.ui.Home.TaskFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_task" />
+    <fragment
+        android:id="@+id/new_NoteBook"
+        android:name="Lop48K14_1.group2.brainnote.ui.Home.NewNotebookFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_new_notebook" />
 </navigation>
