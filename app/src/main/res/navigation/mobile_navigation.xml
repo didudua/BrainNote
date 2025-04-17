@@ -27,4 +27,20 @@
         android:name="Lop48K14_1.group2.brainnote.ui.Home.TaskFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_task" />
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="Lop48K14_1.group2.brainnote.ui.Home.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/nav_notification"
+        android:name="Lop48K14_1.group2.brainnote.ui.Home.NotificationFragment"
+        android:label="fragment_notification"
+        tools:layout="@layout/fragment_notification" />
+    <fragment
+        android:id="@+id/nav_trashcan"
+        android:name="Lop48K14_1.group2.brainnote.ui.Home.TrashCanFragment"
+        android:label="fragment_trashcan"
+        tools:layout="@layout/fragment_trash_can" />
 </navigation>

@@ -13,6 +13,16 @@
         android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent">
 
+
+        <ImageView
+            android:id="@+id/avatarImageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/img"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_background"
+             />
         <!-- Tiêu đề và ngày -->
         <TextView
             android:layout_width="198dp"
@@ -20,7 +30,8 @@
             android:text="Ghi chú của tôi"
             android:textColor="@android:color/black"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"/>
 
         <TextView
             android:id="@+id/dateTextView"
@@ -30,7 +41,8 @@
             android:layout_marginBottom="16dp"
             android:text="Thứ tư, Ngày 19 Tháng 12, 2025"
             android:textColor="@android:color/darker_gray"
-            android:textSize="1sp" />
+            android:textSize="16sp"
+            android:layout_gravity="center_horizontal"/>
 
         <!-- Thanh tìm kiếm -->
         <EditText

@@ -27,6 +27,7 @@ public class MainHomeActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         NavigationUI.setupWithNavController(navView, navController);
+
     }
 }
 
