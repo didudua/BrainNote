@@ -12,30 +12,37 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_notes"
+        android:id="@+id/nav_notes2"
         android:name="Lop48K14_1.group2.brainnote.ui.Home.NoteDetailFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_notes" />
 
     <fragment
         android:id="@+id/nav_notebooks"
-        android:name="Lop48K14_1.group2.brainnote.ui.Home.NotebooksFragment"
+        android:name="Lop48K14_1.group2.brainnote.ui.Notebook.NotebooksFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_notebooks" >
         <action
-            android:id="@+id/action_nav_notebooks_to_new_note_book"
-            app:destination="@id/new_note_book" />
+            android:id="@+id/action_currentFragment_to_newNoteFragment"
+            app:destination="@id/nav_newnotebook" />
+        <action
+            android:id="@+id/action_notebooksFragment_to_notebookDetailFragment"
+            app:destination="@id/notebookDetailFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/new_note_book"
-        android:name="Lop48K14_1.group2.brainnote.ui.Home.NewNotebookFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_new_notebook" />
     <fragment
         android:id="@+id/nav_tasks"
         android:name="Lop48K14_1.group2.brainnote.ui.Home.TaskFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_task" />
+    <fragment
+        android:id="@+id/nav_newnotebook"
+        android:name="Lop48K14_1.group2.brainnote.ui.Notebook.NewNotebookFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_new_notebook" />
+    <fragment
+        android:id="@+id/notebookDetailFragment"
+        android:name="Lop48K14_1.group2.brainnote.ui.Notebook.NotebookDetailFragment"
+        android:label="NotebookDetailFragment" />
 
     <fragment
         android:id="@+id/nav_profile"

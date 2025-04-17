@@ -1,4 +1,4 @@
-package Lop48K14_1.group2.brainnote.ui.Home;
+package Lop48K14_1.group2.brainnote.ui.Notebook;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -21,6 +21,7 @@ import java.util.UUID;
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 
 public class NewNotebookFragment extends Fragment {
 
@@ -78,6 +79,19 @@ public class NewNotebookFragment extends Fragment {
         // Thêm sổ tay vào danh sách
         DataProvider.addNotebook(newNotebook);
 
+        // Lưu vào tệp cục bộ
+        try {
+            JsonSyncManager.saveNotebooksToFile(getContext());
+            Toast.makeText(getContext(), "Đã lưu sổ tay vào bộ nhớ cục bộ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Lỗi khi lưu vào bộ nhớ cục bộ: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        // Tải lên Firebase
+        JsonSyncManager.uploadNotebooksToFirebase();
+        Toast.makeText(getContext(), "Đang đồng bộ sổ tay với Firebase...", Toast.LENGTH_SHORT).show();
+
+        // Thông báo thành công và quay lại
         Toast.makeText(getContext(), "Đã tạo sổ tay mới", Toast.LENGTH_SHORT).show();
 
         if (getActivity() != null) {

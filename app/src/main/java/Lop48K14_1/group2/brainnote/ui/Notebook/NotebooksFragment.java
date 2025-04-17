@@ -1,4 +1,4 @@
-package Lop48K14_1.group2.brainnote.ui.Home;
+package Lop48K14_1.group2.brainnote.ui.Notebook;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -36,6 +36,8 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
     private List<Notebook> filteredNotebooks;
     private EditText searchEditText;
     private TextView notebookCountTextView;
+    private FloatingActionButton addButton;
+
     private FloatingActionButton addNoteBookBtn;
 
     @Nullable
@@ -47,8 +49,8 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
         recyclerView = view.findViewById(R.id.recyclerView);
         searchEditText = view.findViewById(R.id.searchEditText);
         notebookCountTextView = view.findViewById(R.id.notebookCountTextView);
-        addNoteBookBtn = view.findViewById(R.id.addNoteBookBtn);
-
+        addNoteBookBtn = view.findViewById(R.id.addButton);
+        addButton = view.findViewById(R.id.addButton);
         // Thiết lập RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -78,11 +80,11 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
         });
 
         // Thiết lập nút thêm mới
-        addNoteBookBtn.setOnClickListener(new View.OnClickListener() {
+        addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 NavController navController = NavHostFragment.findNavController(NotebooksFragment.this);
-                navController.navigate(R.id.action_nav_notebooks_to_new_note_book);
+                navController.navigate(R.id.action_currentFragment_to_newNoteFragment);
             }
         });
 
@@ -108,21 +110,21 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
     }
 
     private void updateNotebookCount() {
-        notebookCountTextView.setText(filteredNotebooks.size() + " SỔ TAY");
+        notebookCountTextView.setText(filteredNotebooks.size() + " sổ tay");
     }
 
     @Override
     public void onNotebookClick(int position) {
         Notebook selectedNotebook = filteredNotebooks.get(position);
+        if (selectedNotebook == null) return;
 
-        NotebookDetailFragment fragment = new NotebookDetailFragment();
+        // Sử dụng Navigation Component để điều hướng
         Bundle args = new Bundle();
         args.putString("NOTEBOOK_ID", selectedNotebook.getId());
-        fragment.setArguments(args);
 
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).loadFragment(fragment);
-        }
+
+        NavController navController = NavHostFragment.findNavController(this);
+        navController.navigate(R.id.action_notebooksFragment_to_notebookDetailFragment, args);
     }
 
     @Override

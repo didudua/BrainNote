@@ -42,13 +42,24 @@
         android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/headerContainer">
 
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/search_background"
+            android:hint="Tìm ghi chú"
+            android:padding="8dp"
+            android:singleLine="true" />
+
         <TextView
             android:id="@+id/noteCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@android:color/darker_gray"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            tools:text="3 ghi chú" />
+
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

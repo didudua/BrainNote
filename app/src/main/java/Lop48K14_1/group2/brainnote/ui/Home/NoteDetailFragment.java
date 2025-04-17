@@ -60,7 +60,6 @@ public class NoteDetailFragment extends Fragment {
         infoTextView = view.findViewById(R.id.infoTextView);
         backButton = view.findViewById(R.id.backButton);
         filterButton = view.findViewById(R.id.filterButton);
-        menuButton = view.findViewById(R.id.menuButton);
 
         // Thiết lập dữ liệu
         titleTextView.setText(note.getTitle());
