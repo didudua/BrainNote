@@ -1,6 +1,8 @@
 package Lop48K14_1.group2.brainnote.ui.Login;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +32,10 @@ import Lop48K14_1.group2.brainnote.ui.Home.HomeFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
 
 public class WelcomeFragment extends Fragment {
+    private static final String PREFS_NAME      = "BrainNotePrefs";
+    private static final String KEY_LAST_EMAIL  = "last_email";
+
+    private SharedPreferences prefs;
 
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
@@ -38,6 +44,8 @@ public class WelcomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = requireContext()
+                .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -105,6 +113,7 @@ public class WelcomeFragment extends Fragment {
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+                        saveEmail(user.getEmail());
                         Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
 
                         // Chuyển sang MainActivity
@@ -115,5 +124,10 @@ public class WelcomeFragment extends Fragment {
                         Toast.makeText(getContext(), "Xác thực Firebase thất bại", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+    private void saveEmail(String email) {
+        prefs.edit()
+                .putString(KEY_LAST_EMAIL, email)
+                .apply();
     }
 }

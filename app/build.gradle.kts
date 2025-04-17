@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.gridlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -60,6 +61,6 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:21.0.0")
 
     implementation ("com.google.firebase:firebase-firestore:24.10.0")
-
+    implementation ("com.google.firebase:firebase-database:20.2.0")
 
 }

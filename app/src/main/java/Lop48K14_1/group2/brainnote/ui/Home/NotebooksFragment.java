@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,7 +36,7 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
     private List<Notebook> filteredNotebooks;
     private EditText searchEditText;
     private TextView notebookCountTextView;
-    private FloatingActionButton addButton;
+    private FloatingActionButton addNoteBookBtn;
 
     @Nullable
     @Override
@@ -45,7 +47,7 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
         recyclerView = view.findViewById(R.id.recyclerView);
         searchEditText = view.findViewById(R.id.searchEditText);
         notebookCountTextView = view.findViewById(R.id.notebookCountTextView);
-        addButton = view.findViewById(R.id.addButton);
+        addNoteBookBtn = view.findViewById(R.id.addNoteBookBtn);
 
         // Thiết lập RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -76,12 +78,11 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
         });
 
         // Thiết lập nút thêm mới
-        addButton.setOnClickListener(new View.OnClickListener() {
+        addNoteBookBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).loadFragment(new NewNotebookFragment());
-                }
+                NavController navController = NavHostFragment.findNavController(NotebooksFragment.this);
+                navController.navigate(R.id.action_nav_notebooks_to_new_note_book);
             }
         });
 
@@ -107,7 +108,7 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
     }
 
     private void updateNotebookCount() {
-        notebookCountTextView.setText(filteredNotebooks.size() + " sổ tay");
+        notebookCountTextView.setText(filteredNotebooks.size() + " SỔ TAY");
     }
 
     @Override

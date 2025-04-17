@@ -28,4 +28,13 @@
     <color name="textGray">#909090</color>
     <color name="rippleColor">#1F000000</color>
     <color name="dividerGray">#D7D7D7</color>
+    <!-- App specific colors -->
+    <color name="blue">#5C6BC0</color>
+    <color name="coral">#FF8A80</color>
+    <color name="pink">#EC407A</color>
+    <color name="purple">#7E57C2</color>
+    <color name="dark_gray">#424242</color>
+    <color name="medium_gray">#757575</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="white_transparent">#80FFFFFF</color>
 </resources>

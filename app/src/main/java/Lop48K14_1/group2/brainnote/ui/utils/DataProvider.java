@@ -36,6 +36,22 @@ public class DataProvider {
         notebooks.add(new Notebook("4", "Fourth Notebook", new ArrayList<>()));
         notebooks.add(new Notebook("5", "Fifth Notebook", new ArrayList<>()));
         notebooks.add(new Notebook("6", "Sixth Notebook", new ArrayList<>()));
+        notebooks.add(new Notebook("6", "Sixth Notebook", new ArrayList<>()));
+
+        notebooks.add(new Notebook("7", "Sixth Notebook", new ArrayList<>()));
+
+        notebooks.add(new Notebook("8", "Sixth Notebook", new ArrayList<>()));
+
+        notebooks.add(new Notebook("9", "Sixth Notebook", new ArrayList<>()));
+
+        notebooks.add(new Notebook("10", "Sixth Notebook", new ArrayList<>()));
+
+        notebooks.add(new Notebook("11", "Sixth Notebook", new ArrayList<>()));
+
+
+        notebooks.add(new Notebook("12", "Sixth Notebook", new ArrayList<>()));
+
+
     }
 
     public static List<Notebook> getNotebooks() {

@@ -31,12 +31,6 @@
             android:textStyle="bold"
             tools:text="Third Notebook" />
 
-        <ImageButton
-            android:id="@+id/menuButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_more" />
     </LinearLayout>
 
     <LinearLayout
@@ -47,16 +41,6 @@
         android:padding="16dp"
         android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/headerContainer">
-
-        <EditText
-            android:id="@+id/searchEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/search_background"
-            android:drawableEnd="@drawable/ic_search"
-            android:hint="Tìm bất kỳ ghi chú, công việc, hoặc tài liệu..."
-            android:padding="8dp"
-            android:singleLine="true" />
 
         <TextView
             android:id="@+id/noteCountTextView"
@@ -79,7 +63,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:src="@drawable/icon_add_notebook"
         app:backgroundTint="@color/purple_500"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
