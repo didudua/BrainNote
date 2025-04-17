@@ -16,6 +16,11 @@
         android:name="Lop48K14_1.group2.brainnote.ui.Home.NoteDetailFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_notes" />
+    <fragment
+        android:id="@+id/nav_notes2"
+        android:name="Lop48K14_1.group2.brainnote.ui.Home.NotesFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_notes" />
 
     <fragment
         android:id="@+id/nav_notebooks"
