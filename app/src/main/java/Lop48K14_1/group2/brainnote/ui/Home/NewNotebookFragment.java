@@ -1,5 +1,6 @@
 package Lop48K14_1.group2.brainnote.ui.Home;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,9 +25,10 @@ import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 public class NewNotebookFragment extends Fragment {
 
     private EditText nameEditText;
-    private ImageButton backButton;
-    private ImageButton saveButton;
+    private TextView backButton;
+    private TextView saveButton;
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -33,8 +36,8 @@ public class NewNotebookFragment extends Fragment {
 
         // Khởi tạo views
         nameEditText = view.findViewById(R.id.nameEditText);
-        backButton = view.findViewById(R.id.backButton);
-        saveButton = view.findViewById(R.id.saveButton);
+        backButton = view.findViewById(R.id.btn_cancel);
+        saveButton = view.findViewById(R.id.btn_create);
 
         // Thiết lập nút quay lại
         backButton.setOnClickListener(new View.OnClickListener() {
