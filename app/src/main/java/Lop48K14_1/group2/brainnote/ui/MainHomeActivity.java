@@ -27,6 +27,25 @@ public class MainHomeActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
 
         NavigationUI.setupWithNavController(navView, navController);
+        navView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_create) {
+                navController.navigate(R.id.nav_create);
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_notes) {
+                navController.navigate(R.id.nav_notes);
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_notebooks) {
+                navController.navigate(R.id.nav_notebooks);
+                return true;
+            }
+            if (item.getItemId() == R.id.nav_tasks) {
+                navController.navigate(R.id.nav_tasks);
+                return true;
+            }
+            return NavigationUI.onNavDestinationSelected(item, navController);
+        });
     }
 }
 
