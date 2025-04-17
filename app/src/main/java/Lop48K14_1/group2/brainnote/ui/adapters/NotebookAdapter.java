@@ -21,6 +21,8 @@ public class NotebookAdapter extends RecyclerView.Adapter<NotebookAdapter.Notebo
 
     public interface OnNotebookClickListener {
         void onNotebookClick(int position);
+        void onEditNotebook(Notebook notebook, int position);
+        void onDeleteNotebook(Notebook notebook, int position);
     }
 
     public NotebookAdapter(List<Notebook> notebooks, OnNotebookClickListener listener) {
@@ -41,6 +43,19 @@ public class NotebookAdapter extends RecyclerView.Adapter<NotebookAdapter.Notebo
         Notebook notebook = notebooks.get(position);
         holder.nameTextView.setText(notebook.getName());
         holder.countTextView.setText(String.valueOf(notebook.getNotes().size()));
+
+        // Đặt lại trạng thái dịch chuyển ban đầu
+        holder.itemView.setTranslationX(0);
+
+        // Sự kiện nhấn vào mục
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    listener.onNotebookClick(pos);
+                }
+            }
+        });
     }
 
     @Override
@@ -58,18 +73,6 @@ public class NotebookAdapter extends RecyclerView.Adapter<NotebookAdapter.Notebo
             iconImageView = itemView.findViewById(R.id.iconImageView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             countTextView = itemView.findViewById(R.id.countTextView);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onNotebookClick(position);
-                        }
-                    }
-                }
-            });
         }
     }
 }

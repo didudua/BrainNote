@@ -34,6 +34,9 @@ public class Notebook {
         }
         return null;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public void addNote(Note note) {
         notes.add(note);
