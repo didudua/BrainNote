@@ -15,29 +15,18 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/backButton"
+            android:id="@+id/backButtonNewNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:text="Ghi chú mới"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
         <ImageButton
-            android:id="@+id/saveButton"
+            android:id="@+id/filterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/circle_background"
-            android:padding="8dp"
-            android:src="@drawable/ic_check"
-            app:tint="@android:color/white" />
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
     <ScrollView
@@ -53,35 +42,39 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/infoTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/default_newNote_notebook"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp"
-                tools:text="Third Notebook • 21/01/2023" />
+                tools:text="Third Notebook" />
+
+            <!-- EditText for title (replacing TextView with EditText) -->
 
             <EditText
-                android:id="@+id/titleEditText"
+                android:id="@+id/titleNewNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textSize="25sp"
+                android:textStyle="bold"
                 android:background="@null"
-                android:hint="Tiêu đề"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:hint="Tiêu đề" />
+
+            <!-- EditText for content (replacing TextView with EditText) -->
 
             <EditText
-                android:id="@+id/contentEditText"
+                android:id="@+id/contentNewNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@null"
-                android:gravity="top"
-                android:hint="Nội dung ghi chú..."
-                android:inputType="textMultiLine"
+                android:layout_marginLeft="10dp"
                 android:lineSpacingExtra="4dp"
-                android:minHeight="200dp"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:hint="Bắt đầu viết"
+                android:background="@null"
+                />
+
         </LinearLayout>
     </ScrollView>
 

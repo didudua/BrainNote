@@ -15,16 +15,11 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/backButton"
+            android:id="@+id/backButtonNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_back" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/filterButton"
@@ -32,13 +27,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless" />
-
-        <ImageButton
-            android:id="@+id/menuButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_more" />
     </LinearLayout>
 
     <ScrollView
@@ -54,30 +42,39 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/infoTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/default_notebook_note"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp"
-                tools:text="Third Notebook • 21/01/2023" />
+                tools:text="Third Notebook" />
 
-            <TextView
-                android:id="@+id/titleTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="Làm việc" />
+            <!-- EditText for title (replacing TextView with EditText) -->
 
-            <TextView
-                android:id="@+id/contentTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:lineSpacingExtra="4dp"
-                android:textSize="16sp"
-                tools:text="Làm việc, kiểm tra thư cuối cùng\nThời gian: 12:30 21/01/2023" />
+                <EditText
+                    android:id="@+id/titleNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:background="@null"
+                    android:hint="Tiêu đề" />
+
+            <!-- EditText for content (replacing TextView with EditText) -->
+
+                <EditText
+                    android:id="@+id/contentNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginLeft="10dp"
+                    android:lineSpacingExtra="4dp"
+                    android:textSize="16sp"
+                    android:hint="Bắt đầu viết"
+                    android:background="@null"
+                    />
+
         </LinearLayout>
     </ScrollView>
 

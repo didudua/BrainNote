@@ -1,0 +1,100 @@
+package Lop48K14_1.group2.brainnote.ui.Notes;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
+
+import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
+import Lop48K14_1.group2.brainnote.ui.models.Note;
+import Lop48K14_1.group2.brainnote.ui.models.Notebook;
+import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
+
+public class NoteDetailFragment extends Fragment {
+    private EditText titleEditText, contentEditText;
+    private TextView noteBookDefault;
+    private ImageButton backButton;
+    private String notebookId, noteId;
+    private Notebook notebook;
+    private Note note;
+    private final SimpleDateFormat dateFormat =
+            new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+    @Nullable @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup c, Bundle b) {
+        View view = inflater.inflate(R.layout.fragment_note_detail, c, false);
+
+        titleEditText   = view.findViewById(R.id.titleNote);
+        contentEditText = view.findViewById(R.id.contentNote);
+        backButton      = view.findViewById(R.id.backButtonNote);
+        noteBookDefault = view.findViewById(R.id.default_notebook_note);
+
+        // 1. Lấy arguments
+        if (getArguments() != null) {
+            notebookId = getArguments().getString("NOTEBOOK_ID");
+            noteId     = getArguments().getString("NOTE_ID");
+        }
+
+        // 2. Tìm Notebook
+        notebook = DataProvider.getNotebookById(notebookId);
+        if (notebook != null) {
+            noteBookDefault.setText(notebook.getName());
+
+            // 3. Tìm Note trong danh sách của notebook này
+            for (Note n : notebook.getNotes()) {
+                if (n.getId().equals(noteId)) {
+                    note = n;
+                    break;
+                }
+            }
+
+            // 4. Bind dữ liệu lên UI nếu tìm thấy note
+            if (note != null) {
+                titleEditText.setText(note.getTitle());
+                contentEditText.setText(note.getContent());
+            }
+        }
+
+        backButton.setOnClickListener(v -> saveNote());
+
+        return view;
+    }
+
+    private void saveNote() {
+        String newTitle   = titleEditText.getText().toString().trim();
+        String newContent = contentEditText.getText().toString().trim();
+
+        if (TextUtils.isEmpty(newTitle)) {
+            newTitle = "Tài liệu không có tiêu đề";
+        }
+
+        // 1. Cập nhật trực tiếp lên object Note (đã lấy ở onCreateView)
+        if (note != null) {
+            note.setTitle(newTitle);
+            note.setContent(newContent);
+            note.setDate(dateFormat.format(new Date()));
+        }
+
+        // 2. Ghi lại toàn bộ notebooks xuống file và Firebase
+        JsonSyncManager.saveNotebooksToFile(requireContext());
+        JsonSyncManager.uploadNotebooksToFirebase();
+
+        requireActivity().getSupportFragmentManager().popBackStack();
+    }
+}

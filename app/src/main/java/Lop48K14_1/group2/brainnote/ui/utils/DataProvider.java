@@ -12,45 +12,10 @@ import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 
 public class DataProvider {
 
-    private static List<Notebook> notebooks;
+    private static List<Notebook> notebooks = new ArrayList<>();
 
-    static {
-        initializeData();
-    }
-
-    private static void initializeData() {
-        notebooks = new ArrayList<>();
-
-        // Tạo dữ liệu mẫu
-        List<Note> firstNotebookNotes = new ArrayList<>();
-        firstNotebookNotes.add(new Note("101", "Làm việc", "Làm việc, kiểm tra thư cuối cùng\nThời gian: 12:30 21/01/2023", "21/01/2023"));
-        firstNotebookNotes.add(new Note("102", "Tên ghi chú", "Nội dung ghi chú đầu\nThời gian: 14:15 22/01/2023", "22/01/2023"));
-        firstNotebookNotes.add(new Note("103", "Tên ghi chú", "Nội dung ghi chú thứ hai\nThời gian: 09:45 23/01/2023", "23/01/2023"));
-
-        List<Note> thirdNotebookNotes = new ArrayList<>();
-        thirdNotebookNotes.add(new Note("301", "Làm việc", "Làm việc, kiểm tra thư cuối cùng\nThời gian: 12:30 21/01/2023", "21/01/2023"));
-
-        notebooks.add(new Notebook("1", "First Notebook", firstNotebookNotes));
-        notebooks.add(new Notebook("2", "Second Notebook", new ArrayList<>()));
-        notebooks.add(new Notebook("3", "Third Notebook", thirdNotebookNotes));
-        notebooks.add(new Notebook("4", "Fourth Notebook", new ArrayList<>()));
-        notebooks.add(new Notebook("5", "Fifth Notebook", new ArrayList<>()));
-        notebooks.add(new Notebook("6", "Sixth Notebook", new ArrayList<>()));
-        notebooks.add(new Notebook("6", "Sixth Notebook", new ArrayList<>()));
-
-        notebooks.add(new Notebook("7", "Sixth Notebook", new ArrayList<>()));
-
-        notebooks.add(new Notebook("8", "Sixth Notebook", new ArrayList<>()));
-
-        notebooks.add(new Notebook("9", "Sixth Notebook", new ArrayList<>()));
-
-        notebooks.add(new Notebook("10", "Sixth Notebook", new ArrayList<>()));
-
-        notebooks.add(new Notebook("11", "Sixth Notebook", new ArrayList<>()));
-
-
-        notebooks.add(new Notebook("12", "Sixth Notebook", new ArrayList<>()));
-
+    // Khởi tạo dữ liệu mẫu nếu cần
+    public static void initializeSampleData() {
 
     }
 
@@ -78,11 +43,21 @@ public class DataProvider {
         }
     }
 
+    // Cập nhật danh sách notebooks từ dữ liệu nhập
+    public static void updateNotebooks(List<Notebook> newNotebooks) {
+        notebooks.clear();
+        notebooks.addAll(newNotebooks);
+    }
+
+    // Làm mới dữ liệu (xóa danh sách hiện tại)
+    public static void clearData() {
+        notebooks.clear();
+    }
+
     // Chuyển đổi dữ liệu sang JSON
     public static String getDataAsJson() {
         try {
             JSONArray notebooksArray = new JSONArray();
-
             for (Notebook notebook : notebooks) {
                 JSONObject notebookObj = new JSONObject();
                 notebookObj.put("id", notebook.getId());
@@ -110,5 +85,19 @@ public class DataProvider {
             e.printStackTrace();
             return "{}";
         }
+    }
+
+    public static Note getNoteById(String notebookId, String noteId) {
+        // Lấy sổ tay
+        Notebook nb = getNotebookById(notebookId);
+        if (nb == null) return null;
+
+        // Duyệt qua các ghi chú
+        for (Note n : nb.getNotes()) {
+            if (n.getId().equals(noteId)) {
+                return n;
+            }
+        }
+        return null;
     }
 }
