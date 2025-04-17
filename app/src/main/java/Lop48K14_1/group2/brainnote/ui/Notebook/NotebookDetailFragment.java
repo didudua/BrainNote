@@ -1,8 +1,9 @@
-package Lop48K14_1.group2.brainnote.ui.Home;
+package Lop48K14_1.group2.brainnote.ui.Notebook;
 
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,8 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.ui.Home.NewNoteFragment;
 import Lop48K14_1.group2.brainnote.ui.adapters.NoteAdapter;
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
@@ -38,7 +41,6 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     private TextView titleTextView;
     private TextView noteCountTextView;
     private ImageButton backButton;
-    private ImageButton menuButton;
     private FloatingActionButton addButton;
     private Notebook notebook;
     private String notebookId;
@@ -57,7 +59,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         notebook = DataProvider.getNotebookById(notebookId);
 
         if (notebook == null) {
-            // Quay lại fragment trước đó nếu không tìm thấy sổ tay
+            Log.e("NotebookDetailFragment", "Notebook not found for ID: " + notebookId);
             if (getActivity() != null) {
                 getActivity().getSupportFragmentManager().popBackStack();
             }
@@ -66,12 +68,11 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
 
         // Khởi tạo views
         recyclerView = view.findViewById(R.id.recyclerView);
-        searchEditText = view.findViewById(R.id.searchEditText);
         titleTextView = view.findViewById(R.id.titleTextView);
         noteCountTextView = view.findViewById(R.id.noteCountTextView);
         backButton = view.findViewById(R.id.backButton);
-        menuButton = view.findViewById(R.id.menuButton);
         addButton = view.findViewById(R.id.addButton);
+        searchEditText = view.findViewById(R.id.searchEditText);
 
         // Thiết lập tiêu đề
         titleTextView.setText(notebook.getName());
@@ -82,6 +83,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         // Lấy dữ liệu
         notes = notebook.getNotes();
         filteredNotes = new ArrayList<>(notes);
+        Log.d("NotebookDetailFragment", "Number of notes: " + notes.size());
 
         // Thiết lập adapter
         adapter = new NoteAdapter(filteredNotes, this);
@@ -91,42 +93,35 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         updateNoteCount();
 
         // Thiết lập tìm kiếm
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        if (searchEditText != null) {
+            searchEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterNotes(s.toString());
-            }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterNotes(s.toString());
+                }
 
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        } else {
+            Log.w("NotebookDetailFragment", "searchEditText is null, search functionality disabled");
+        }
 
         // Thiết lập nút quay lại
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() != null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-            }
+        backButton.setOnClickListener(v -> {
+            NavController navController = NavHostFragment.findNavController(NotebookDetailFragment.this);
+            navController.navigateUp();
         });
 
         // Thiết lập nút thêm mới
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NewNoteFragment fragment = new NewNoteFragment();
-                Bundle args = new Bundle();
-                args.putString("NOTEBOOK_ID", notebookId);
-                fragment.setArguments(args);
+        addButton.setOnClickListener(v -> {
+            Bundle newArgs = new Bundle();
+            newArgs.putString("NOTEBOOK_ID", notebookId);
+            NavController navController = NavHostFragment.findNavController(NotebookDetailFragment.this);
 
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).loadFragment(fragment);
-                }
-            }
         });
 
         return view;
@@ -152,22 +147,32 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     }
 
     private void updateNoteCount() {
-        noteCountTextView.setText(filteredNotes.size() + " ghi chú");
+        if (filteredNotes.isEmpty()) {
+            noteCountTextView.setText("Không có ghi chú nào");
+        } else {
+            noteCountTextView.setText(filteredNotes.size() + " ghi chú");
+        }
     }
 
     @Override
     public void onNoteClick(int position) {
-        Note selectedNote = filteredNotes.get(position);
+        if (filteredNotes == null || position >= filteredNotes.size()) {
+            Log.e("NotebookDetailFragment", "Invalid note position: " + position);
+            return;
+        }
 
-        NoteDetailFragment fragment = new NoteDetailFragment();
+        Note selectedNote = filteredNotes.get(position);
+        if (selectedNote == null) {
+            Log.e("NotebookDetailFragment", "Selected note is null at position: " + position);
+            return;
+        }
+
         Bundle args = new Bundle();
         args.putString("NOTEBOOK_ID", notebookId);
         args.putString("NOTE_ID", selectedNote.getId());
-        fragment.setArguments(args);
 
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).loadFragment(fragment);
-        }
+        NavController navController = NavHostFragment.findNavController(this);
+
     }
 
     @Override
@@ -177,7 +182,14 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         notebook = DataProvider.getNotebookById(notebookId);
         if (notebook != null) {
             notes = notebook.getNotes();
-            filterNotes(searchEditText.getText().toString());
+            if (searchEditText != null && searchEditText.getText() != null) {
+                filterNotes(searchEditText.getText().toString());
+            } else {
+                filteredNotes.clear();
+                filteredNotes.addAll(notes);
+                adapter.notifyDataSetChanged();
+                updateNoteCount();
+            }
         }
     }
 }
