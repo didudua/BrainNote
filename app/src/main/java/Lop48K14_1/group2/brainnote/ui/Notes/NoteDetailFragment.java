@@ -32,7 +32,7 @@ public class NoteDetailFragment extends Fragment {
     private EditText titleEditText, contentEditText;
     private TextView noteBookDefault;
     private ImageButton backButton;
-    private String notebookId, noteId;
+    private String notebookId, noteId, originalNotebookId;
     private Notebook notebook;
     private Note note;
     private List<Notebook> notebooks;
@@ -53,12 +53,14 @@ public class NoteDetailFragment extends Fragment {
         notebooks = DataProvider.getNotebooks();
 
         // 2. Khởi tạo giá trị mặc định
-        if (getArguments() != null && getArguments().containsKey("NOTEBOOK_ID")) {
-            notebookId = getArguments().getString("NOTEBOOK_ID");
-            noteId     = getArguments().getString("NOTE_ID");
+        if (getArguments()!=null) {
+            originalNotebookId = getArguments().getString("NOTEBOOK_ID");
+            notebookId         = originalNotebookId;
+            noteId             = getArguments().getString("NOTE_ID");
         } else {
-            notebookId = notebooks.get(0).getId();
-            noteId     = getArguments().getString("NOTE_ID");
+            originalNotebookId = notebooks.get(0).getId();
+            notebookId         = originalNotebookId;
+            noteId             = "";
         }
         // Hiển thị tên sổ hiện tại
         notebook = DataProvider.getNotebookById(notebookId);
@@ -117,9 +119,14 @@ public class NoteDetailFragment extends Fragment {
         // 1. Cập nhật trực tiếp lên object Note (đã lấy ở onCreateView)
         if (note != null) {
             note.setTitle(newTitle);
-            note.setId(notebookId);
             note.setContent(newContent);
             note.setDate(dateFormat.format(new Date()));
+        }
+        if (!notebookId.equals(originalNotebookId)) {
+            // xóa note khỏi sổ cũ
+            DataProvider.removeNoteFromNotebook(originalNotebookId, noteId);
+            // thêm note vào sổ mới
+            DataProvider.addNoteToNotebook(notebookId, note);
         }
 
         // 2. Ghi lại toàn bộ notebooks xuống file và Firebase

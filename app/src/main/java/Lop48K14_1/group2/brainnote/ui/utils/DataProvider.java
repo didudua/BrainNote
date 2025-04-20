@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.ui.models.Note;
@@ -99,5 +100,19 @@ public class DataProvider {
             }
         }
         return null;
+    }
+
+    public static void removeNoteFromNotebook(String notebookId, String noteId) {
+        Notebook nb = getNotebookById(notebookId);
+        if (nb == null) return;
+
+        // Dùng Iterator để tránh ConcurrentModificationException
+        Iterator<Note> iter = nb.getNotes().iterator();
+        while (iter.hasNext()) {
+            if (iter.next().getId().equals(noteId)) {
+                iter.remove();
+                break;
+            }
+        }
     }
 }
