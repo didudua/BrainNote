@@ -6,8 +6,7 @@
     android:orientation="horizontal"
     android:padding="16dp"
     android:gravity="center_vertical"
-    android:background="@android:color/transparent"
-    android:layout_marginTop="20dp">
+    android:background="@android:color/transparent">
 
     <!-- Ảnh đại diện -->
     <ImageView

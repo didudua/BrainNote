@@ -77,8 +77,11 @@ public class JsonSyncManager {
         String userId = user.getUid();
         String email = user.getEmail();  // <-- lấy email người dùng
         String username = "";
-        if (email != null && email.contains("@")) {
-            username = email.substring(0, email.indexOf("@"));
+        username = user.getDisplayName();
+        if(username == ""){
+            if (email != null && email.contains("@")) {
+                username = email.substring(0, email.indexOf("@"));
+            }
         }
         String jsonData = exportDataAsJson();
 
