@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/headerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="@android:color/transparent"
+    android:layout_marginTop="20dp">
+
+    <!-- Ảnh đại diện -->
+    <ImageView
+        android:id="@+id/avatarImageView"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/img"
+        android:scaleType="centerCrop"
+        android:contentDescription="Avatar người dùng" />
+
+</LinearLayout>

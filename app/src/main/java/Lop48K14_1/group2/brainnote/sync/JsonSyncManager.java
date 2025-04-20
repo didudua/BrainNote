@@ -75,13 +75,24 @@ public class JsonSyncManager {
         }
 
         String userId = user.getUid();
+        String email = user.getEmail();  // <-- lấy email người dùng
+        String username = "";
+        if (email != null && email.contains("@")) {
+            username = email.substring(0, email.indexOf("@"));
+        }
         String jsonData = exportDataAsJson();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("users/" + userId + "/backup_json");
-        ref.setValue(jsonData)
+        DatabaseReference userRef = database.getReference("users").child(userId);
+
+        // Upload cả email và backup_json vào cùng cấp
+        userRef.child("email").setValue(email);
+        userRef.child("username").setValue(username);
+        userRef.child("backup_json").setValue(jsonData)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Upload to Firebase successful for user: " + userId))
                 .addOnFailureListener(e -> Log.e(TAG, "Upload to Firebase failed for user: " + userId + ": " + e.getMessage(), e));
     }
+
 
     public static void saveNotebooksToFile(Context context) {
         try {

@@ -6,6 +6,7 @@
     android:background="@android:color/white">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -59,11 +60,11 @@
         <GridLayout
             android:layout_width="325dp"
             android:layout_height="386dp"
+            android:layout_marginTop="50sp"
             android:alignmentMode="alignMargins"
             android:columnCount="2"
             android:columnOrderPreserved="false"
-            android:rowCount="2"
-            android:layout_marginTop="50sp">
+            android:rowCount="2">
 
             <!-- Card Ghi chú mới -->
             <androidx.cardview.widget.CardView
