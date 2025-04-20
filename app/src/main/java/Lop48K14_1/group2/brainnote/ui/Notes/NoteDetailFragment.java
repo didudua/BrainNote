@@ -1,6 +1,7 @@
 package Lop48K14_1.group2.brainnote.ui.Notes;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -33,6 +35,8 @@ public class NoteDetailFragment extends Fragment {
     private String notebookId, noteId;
     private Notebook notebook;
     private Note note;
+    private List<Notebook> notebooks;
+
     private final SimpleDateFormat dateFormat =
             new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
@@ -45,11 +49,37 @@ public class NoteDetailFragment extends Fragment {
         backButton      = view.findViewById(R.id.backButtonNote);
         noteBookDefault = view.findViewById(R.id.default_notebook_note);
 
-        // 1. Lấy arguments
-        if (getArguments() != null) {
+        // 1. Lấy danh sách sổ
+        notebooks = DataProvider.getNotebooks();
+
+        // 2. Khởi tạo giá trị mặc định
+        if (getArguments() != null && getArguments().containsKey("NOTEBOOK_ID")) {
             notebookId = getArguments().getString("NOTEBOOK_ID");
             noteId     = getArguments().getString("NOTE_ID");
+        } else {
+            notebookId = notebooks.get(0).getId();
+            noteId     = getArguments().getString("NOTE_ID");
         }
+        // Hiển thị tên sổ hiện tại
+        notebook = DataProvider.getNotebookById(notebookId);
+        noteBookDefault.setText(notebook.getName());
+
+        // 3. Khi nhấn vào TextView thì bật dialog
+        noteBookDefault.setOnClickListener(v -> {
+            // Chuẩn bị mảng tên để show
+            String[] names = new String[notebooks.size()];
+            for (int i = 0; i < notebooks.size(); i++) {
+                names[i] = notebooks.get(i).getName();
+            }
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Chọn sổ để thêm ghi chú")
+                    .setItems(names, (dialog, which) -> {
+                        // Cập nhật notebookId và tên hiển thị
+                        notebookId = notebooks.get(which).getId();
+                        noteBookDefault.setText(names[which]);
+                    })
+                    .show();
+        });
 
         // 2. Tìm Notebook
         notebook = DataProvider.getNotebookById(notebookId);
@@ -87,6 +117,7 @@ public class NoteDetailFragment extends Fragment {
         // 1. Cập nhật trực tiếp lên object Note (đã lấy ở onCreateView)
         if (note != null) {
             note.setTitle(newTitle);
+            note.setId(notebookId);
             note.setContent(newContent);
             note.setDate(dateFormat.format(new Date()));
         }

@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="Ghi chú của tôi"
             android:textColor="@android:color/black"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:textAlignment="center"
             android:layout_gravity="center_horizontal"/>
@@ -63,7 +63,7 @@
         <GridLayout
             android:layout_width="325dp"
             android:layout_height="386dp"
-            android:layout_marginTop="50sp"
+            android:layout_marginTop="30sp"
             android:alignmentMode="alignMargins"
             android:columnCount="2"
             android:columnOrderPreserved="false"
@@ -84,7 +84,8 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:id="@+id/home_new_note">
 
                     <TextView
                         android:id="@+id/textView2"
@@ -132,7 +133,8 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:id="@+id/home_new_task">
 
                     <TextView
                         android:id="@+id/textView3"
@@ -179,7 +181,8 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:id="@+id/home_new_notebook">
 
                     <TextView
                         android:id="@+id/textView4"
