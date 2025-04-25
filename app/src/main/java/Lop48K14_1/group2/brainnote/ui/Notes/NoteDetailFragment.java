@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,98 +37,97 @@ public class NoteDetailFragment extends Fragment {
     private List<Notebook> notebooks;
 
     private final SimpleDateFormat dateFormat =
-            new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy", Locale.getDefault());
 
     @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup c, Bundle b) {
-        View view = inflater.inflate(R.layout.fragment_note_detail, c, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_note_detail, container, false);
 
+        // Bind views
         titleEditText   = view.findViewById(R.id.titleNote);
         contentEditText = view.findViewById(R.id.contentNote);
         backButton      = view.findViewById(R.id.backButtonNote);
         noteBookDefault = view.findViewById(R.id.default_notebook_note);
 
-        // 1. Lấy danh sách sổ
+        // Load notebooks
         notebooks = DataProvider.getNotebooks();
 
-        // 2. Khởi tạo giá trị mặc định
-        if (getArguments()!=null) {
-            originalNotebookId = getArguments().getString("NOTEBOOK_ID");
-            notebookId         = originalNotebookId;
-            noteId             = getArguments().getString("NOTE_ID");
+        // Get args
+        Bundle args = getArguments();
+        if (args != null) {
+            originalNotebookId = args.getString("NOTEBOOK_ID");
+            noteId             = args.getString("NOTE_ID", "");
         } else {
+            // Default to first notebook for new note
             originalNotebookId = notebooks.get(0).getId();
-            notebookId         = originalNotebookId;
             noteId             = "";
         }
-        // Hiển thị tên sổ hiện tại
+        notebookId = originalNotebookId;
+
+        // Display current notebook
         notebook = DataProvider.getNotebookById(notebookId);
         noteBookDefault.setText(notebook.getName());
 
-        // 3. Khi nhấn vào TextView thì bật dialog
+        // Choose another notebook
         noteBookDefault.setOnClickListener(v -> {
-            // Chuẩn bị mảng tên để show
             String[] names = new String[notebooks.size()];
             for (int i = 0; i < notebooks.size(); i++) {
                 names[i] = notebooks.get(i).getName();
             }
             new AlertDialog.Builder(requireContext())
-                    .setTitle("Chọn sổ để thêm ghi chú")
+                    .setTitle("Chọn sổ để lưu ghi chú")
                     .setItems(names, (dialog, which) -> {
-                        // Cập nhật notebookId và tên hiển thị
                         notebookId = notebooks.get(which).getId();
                         noteBookDefault.setText(names[which]);
                     })
                     .show();
         });
 
-        // 2. Tìm Notebook
-        notebook = DataProvider.getNotebookById(notebookId);
-        if (notebook != null) {
-            noteBookDefault.setText(notebook.getName());
-
-            // 3. Tìm Note trong danh sách của notebook này
-            for (Note n : notebook.getNotes()) {
-                if (n.getId().equals(noteId)) {
-                    note = n;
-                    break;
-                }
-            }
-
-            // 4. Bind dữ liệu lên UI nếu tìm thấy note
-            if (note != null) {
-                titleEditText.setText(note.getTitle());
-                contentEditText.setText(note.getContent());
-            }
+        // Load existing note if editing
+        if (!TextUtils.isEmpty(noteId)) {
+            note = DataProvider.getNotebookById(originalNotebookId)
+                    .getNotes().stream()
+                    .filter(n -> n.getId().equals(noteId))
+                    .findFirst().orElse(null);
+        }
+        if (note != null) {
+            titleEditText.setText(note.getTitle());
+            contentEditText.setText(note.getContent());
         }
 
+        // Save or create
         backButton.setOnClickListener(v -> saveNote());
-
         return view;
     }
 
     private void saveNote() {
         String newTitle   = titleEditText.getText().toString().trim();
         String newContent = contentEditText.getText().toString().trim();
-
         if (TextUtils.isEmpty(newTitle)) {
             newTitle = "Tài liệu không có tiêu đề";
         }
+        String now = dateFormat.format(new Date());
 
-        // 1. Cập nhật trực tiếp lên object Note (đã lấy ở onCreateView)
-        if (note != null) {
+        if (note == null) {
+            // Create new note
+            String newId = UUID.randomUUID().toString();
+            Note newNote = new Note(newId, newTitle, newContent, now, notebookId);
+            DataProvider.addNoteToNotebook(notebookId, newNote);
+        } else {
+            // Update existing
             note.setTitle(newTitle);
             note.setContent(newContent);
-            note.setDate(dateFormat.format(new Date()));
-        }
-        if (!notebookId.equals(originalNotebookId)) {
-            // xóa note khỏi sổ cũ
-            DataProvider.removeNoteFromNotebook(originalNotebookId, noteId);
-            // thêm note vào sổ mới
-            DataProvider.addNoteToNotebook(notebookId, note);
+            note.setDate(now);
+            // Move if notebook changed
+            if (!notebookId.equals(originalNotebookId)) {
+                DataProvider.removeNoteFromNotebook(originalNotebookId, noteId);
+                DataProvider.addNoteToNotebook(notebookId, note);
+            }
         }
 
-        // 2. Ghi lại toàn bộ notebooks xuống file và Firebase
+        // Sync
         JsonSyncManager.saveNotebooksToFile(requireContext());
         JsonSyncManager.uploadNotebooksToFirebase();
 

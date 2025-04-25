@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,27 +44,28 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notes, container, false);
 
-        // Initialize RecyclerView
+        // Setup RecyclerView
         recyclerView = view.findViewById(R.id.rvNotes);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Initialize search EditText
+        // Search
         searchEditText = view.findViewById(R.id.searchNote);
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (noteAdapter != null) {
                     noteAdapter.getFilter().filter(s);
-                    updateNoteCount();
+                    updateNoteCount(noteAdapter.getItemCount());
                 }
             }
-            @Override public void afterTextChanged(Editable s) {}
         });
 
-        // Initialize note count TextView
+        // Note count
         noteCount = view.findViewById(R.id.tvNoteCount);
 
-        // Floating action button to add new note
+        // Add new note button
         addButtonNote = view.findViewById(R.id.addButtonNote);
         addButtonNote.setOnClickListener(v -> {
             Notebook defaultNb = DataProvider.getNotebooks().get(0);
@@ -73,19 +75,19 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
             nav.navigate(R.id.action_nav_notes_to_nav_new_note, args);
         });
 
-        // Load notes
+        // Load all notes
         loadNotes();
-
         return view;
     }
 
-    // Update the note count
-    private void updateNoteCount() {
-        int count = noteAdapter != null ? noteAdapter.getItemCount() : 0;
-        noteCount.setText(count + " ghi chú");
+    private void updateNoteCount(int count) {
+        if (count <= 0) {
+            noteCount.setText("Không có ghi chú nào");
+        } else {
+            noteCount.setText(count + " ghi chú");
+        }
     }
 
-    // Load notes from Firebase or local file
     private void loadNotes() {
         JsonSyncManager.importDataWithFallback(getContext(), new JsonSyncManager.OnDataImported() {
             @Override
@@ -98,20 +100,18 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
 
                 noteAdapter = new NoteAdapter(notes, NotesFragment.this);
                 recyclerView.setAdapter(noteAdapter);
-                updateNoteCount();
+                updateNoteCount(noteAdapter.getItemCount());
             }
 
             @Override
             public void onFailure(Exception e) {
-                // Handle failure
+                Log.e("NotesFragment", "Failed to load notes", e);
             }
         });
     }
 
-    // Handle note click event
     @Override
-    public void onNoteClick(int position) {
-        Note clickedNote = notes.get(position);
+    public void onNoteClick(Note clickedNote) {
         Bundle args = new Bundle();
         args.putString("NOTEBOOK_ID", clickedNote.getNotebookId());
         args.putString("NOTE_ID", clickedNote.getId());

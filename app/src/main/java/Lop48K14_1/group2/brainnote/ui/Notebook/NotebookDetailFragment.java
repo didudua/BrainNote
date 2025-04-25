@@ -163,24 +163,12 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     }
 
     @Override
-    public void onNoteClick(int position) {
-        if (filteredNotes == null || position >= filteredNotes.size()) {
-            Log.e("NotebookDetailFragment", "Invalid note position: " + position);
-            return;
-        }
-
-        Note selectedNote = filteredNotes.get(position);
-        if (selectedNote == null) {
-            Log.e("NotebookDetailFragment", "Selected note is null at position: " + position);
-            return;
-        }
+    public void onNoteClick(Note clickedNote) {
         Bundle args = new Bundle();
-        args.putString("NOTEBOOK_ID", notebookId);
-        args.putString("NOTE_ID", selectedNote.getId());
-
-        NavController navController = NavHostFragment.findNavController(this);
-        navController.navigate(R.id.action_notebookDetailFragment_to_nav_note_detail, args);
-
+        args.putString("NOTEBOOK_ID", clickedNote.getNotebookId());
+        args.putString("NOTE_ID", clickedNote.getId());
+        NavController nav = NavHostFragment.findNavController(this);
+        nav.navigate(R.id.action_notebookDetailFragment_to_nav_note_detail, args);
     }
 
     @Override
