@@ -10,26 +10,34 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> implements Filterable {
 
-    private List<Note> notes;            // Danh sách hiện tại hiển thị
-    private List<Note> notesFull;        // Bản sao đầy đủ dùng để lọc
+    private List<Note> notes;
+    private List<Note> notesFull;
     private OnNoteClickListener listener;
+    private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy", Locale.getDefault());
 
+    // Giao tiếp click vào note
     public interface OnNoteClickListener {
-        void onNoteClick(int position);
+        void onNoteClick(Note note);
     }
 
     public NoteAdapter(List<Note> notes, OnNoteClickListener listener) {
-        this.notes = new ArrayList<>(notes);
-        this.notesFull = new ArrayList<>(notes);
         this.listener = listener;
+        this.notesFull = new ArrayList<>(notes);
+        sortByDateDesc(notesFull);
+        this.notes = new ArrayList<>(notesFull);
     }
 
     @NonNull
@@ -65,15 +73,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             if (constraint == null || constraint.length() == 0) {
                 filteredList.addAll(notesFull);
             } else {
-                String filterPattern = constraint.toString().toLowerCase().trim();
-                for (Note note : notesFull) {
-                    if (note.getTitle().toLowerCase().contains(filterPattern)
-                            || note.getContent().toLowerCase().contains(filterPattern)) {
-                        filteredList.add(note);
+                String f = constraint.toString().toLowerCase().trim();
+                for (Note n : notesFull) {
+                    if (n.getTitle().toLowerCase().contains(f) || n.getContent().toLowerCase().contains(f)) {
+                        filteredList.add(n);
                     }
                 }
             }
-
+            sortByDateDesc(filteredList);
             FilterResults results = new FilterResults();
             results.values = filteredList;
             return results;
@@ -82,30 +89,49 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             notes.clear();
-            //noinspection unchecked
             notes.addAll((List<Note>) results.values);
             notifyDataSetChanged();
         }
     };
 
+    private void sortByDateDesc(List<Note> list) {
+        Collections.sort(list, (n1, n2) -> {
+            try {
+                Date d1 = sdf.parse(n1.getDate());
+                Date d2 = sdf.parse(n2.getDate());
+                return d2.compareTo(d1);
+            } catch (ParseException e) {
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * Lấy Note tại vị trí để xóa hoặc thao tác khác
+     */
+    public Note getNoteAt(int position) {
+        return notes.get(position);
+    }
+
+    /**
+     * Xóa item khỏi adapter và thông báo thay đổi
+     */
+    public void removeAt(int position) {
+        notes.remove(position);
+        notifyItemRemoved(position);
+    }
+
     public class NoteViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView;
-        TextView contentTextView;
-        TextView dateTextView;
-
-        public NoteViewHolder(@NonNull View itemView) {
-            super(itemView);
-            titleTextView = itemView.findViewById(R.id.tvNoteTitle);
-            contentTextView = itemView.findViewById(R.id.tvNoteContent);
-            dateTextView = itemView.findViewById(R.id.tvNoteTime);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION && listener != null) {
-                        listener.onNoteClick(position);
-                    }
+        TextView titleTextView, contentTextView, dateTextView;
+        public NoteViewHolder(@NonNull View v) {
+            super(v);
+            titleTextView   = v.findViewById(R.id.tvNoteTitle);
+            contentTextView = v.findViewById(R.id.tvNoteContent);
+            dateTextView    = v.findViewById(R.id.tvNoteTime);
+            v.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onNoteClick(notes.get(pos));
                 }
             });
         }

@@ -100,7 +100,7 @@ public class NewNoteFragment extends Fragment {
                 notebookId,
                 title,
                 content,
-                new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())
+                new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy", Locale.getDefault()).format(new Date())
         );
 
         if (notebook!=null) {

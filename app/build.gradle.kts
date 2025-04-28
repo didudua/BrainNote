@@ -63,5 +63,4 @@ dependencies {
 
     implementation ("com.google.firebase:firebase-firestore:24.10.0")
     implementation ("com.google.firebase:firebase-database:20.2.0")
-
 }
