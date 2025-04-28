@@ -1,6 +1,9 @@
 package Lop48K14_1.group2.brainnote.ui.Home;
 
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +30,7 @@ import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
 
 public class ProfileFragment extends Fragment {
+    private static final String PREFS_NAME      = "BrainNotePrefs";
 
     private TextView tvUsername, tvEmail, tv_Username, tv_Email;
     private LinearLayout btnLogout;
@@ -52,6 +56,11 @@ public class ProfileFragment extends Fragment {
         btnBack.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(v);
             navController.navigate(R.id.action_profileFragment_to_homeFragment);
+        });
+        LinearLayout addAccountLayout = view.findViewById(R.id.addAccount);
+        addAccountLayout.setOnClickListener(v -> {
+            PopupLoginFragment dialog = new PopupLoginFragment();
+            dialog.show(getParentFragmentManager(), "login_popup");
         });
 
         // Gọi hàm tải dữ liệu người dùng
@@ -101,12 +110,22 @@ public class ProfileFragment extends Fragment {
 
         btnLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();  // Xóa tất cả dữ liệu trong SharedPreferences
+            editor.apply();
+
+            tvUsername.setText("");
+            tvEmail.setText("");
+            tv_Username.setText("");
+            tv_Email.setText("");
 
             // Chuyển về màn hình đăng nhập
             Intent intent = new Intent(getActivity(), MainActivity.class); // hoặc LoginActivity nếu bạn có
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // clear hết stack
             startActivity(intent);
         });
+
 
     }
 }
