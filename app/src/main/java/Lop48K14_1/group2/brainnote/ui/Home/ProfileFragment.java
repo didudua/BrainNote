@@ -1,6 +1,5 @@
 package Lop48K14_1.group2.brainnote.ui.Home;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,11 +25,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+
 import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
 public class ProfileFragment extends Fragment {
-    private static final String PREFS_NAME      = "BrainNotePrefs";
+    private static final String PREFS_NAME = "BrainNotePrefs";
 
     private TextView tvUsername, tvEmail, tv_Username, tv_Email;
     private LinearLayout btnLogout;
@@ -40,16 +42,15 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         btnLogout = view.findViewById(R.id.btnLogout);
 
         // Khởi tạo TextView
         tvUsername = view.findViewById(R.id.tvUsername);
-        tvEmail= view.findViewById(R.id.tvEmail);
+        tvEmail = view.findViewById(R.id.tvEmail);
         tv_Username = view.findViewById(R.id.tv_Username);
-        tv_Email= view.findViewById(R.id.tv_Email);
+        tv_Email = view.findViewById(R.id.tv_Email);
 
         // Gắn sự kiện nút quay về
         ImageButton btnBack = view.findViewById(R.id.btnBack);
@@ -57,6 +58,7 @@ public class ProfileFragment extends Fragment {
             NavController navController = Navigation.findNavController(v);
             navController.navigate(R.id.action_profileFragment_to_homeFragment);
         });
+
         LinearLayout addAccountLayout = view.findViewById(R.id.addAccount);
         addAccountLayout.setOnClickListener(v -> {
             PopupLoginFragment dialog = new PopupLoginFragment();
@@ -65,6 +67,9 @@ public class ProfileFragment extends Fragment {
 
         // Gọi hàm tải dữ liệu người dùng
         loadUserData();
+
+        // Gắn sự kiện đăng xuất
+        btnLogout.setOnClickListener(v -> logout());
 
         return view;
     }
@@ -76,8 +81,8 @@ public class ProfileFragment extends Fragment {
 
             // Sử dụng đúng DatabaseReference cho Firebase Realtime Database
             DatabaseReference userRef = FirebaseDatabase.getInstance()
-                    .getReference("users")  // Chú ý là node gốc là "users"
-                    .child(uid);  // Dùng userID của người dùng hiện tại để lấy dữ liệu
+                    .getReference("users")
+                    .child(uid);
 
             // Đọc dữ liệu người dùng từ Firebase
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -89,7 +94,7 @@ public class ProfileFragment extends Fragment {
 
                     // Kiểm tra và hiển thị dữ liệu người dùng
                     if (email != null && username != null) {
-                        tvUsername.setText( username );
+                        tvUsername.setText(username);
                         tvEmail.setText(email);
                         tv_Username.setText(username);
                         tv_Email.setText(email);
@@ -106,26 +111,54 @@ public class ProfileFragment extends Fragment {
         } else {
             Log.e("FirebaseAuth", "Người dùng chưa đăng nhập");
         }
+    }
 
+    private void logout() {
+        // Xóa dữ liệu cục bộ
+        clearLocalData();
 
-        btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear();  // Xóa tất cả dữ liệu trong SharedPreferences
-            editor.apply();
+        // Xóa dữ liệu trong DataProvider
+        DataProvider.clearData();
 
-            tvUsername.setText("");
-            tvEmail.setText("");
-            tv_Username.setText("");
-            tv_Email.setText("");
+        // Đăng xuất khỏi Firebase
+        FirebaseAuth.getInstance().signOut();
 
-            // Chuyển về màn hình đăng nhập
-            Intent intent = new Intent(getActivity(), MainActivity.class); // hoặc LoginActivity nếu bạn có
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // clear hết stack
-            startActivity(intent);
-        });
+        // Xóa dữ liệu trong SharedPreferences
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
 
+        // Xóa dữ liệu hiển thị trên giao diện
+        tvUsername.setText("");
+        tvEmail.setText("");
+        tv_Username.setText("");
+        tv_Email.setText("");
 
+        // Chuyển về màn hình đăng nhập
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+        // Đóng MainHomeActivity
+        getActivity().finish();
+    }
+
+    private void clearLocalData() {
+        try {
+            File file = new File(getActivity().getFilesDir(), "notebooks_backup.json");
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (deleted) {
+                    Log.d("ProfileFragment", "Local backup file deleted successfully.");
+                } else {
+                    Log.e("ProfileFragment", "Failed to delete local backup file.");
+                }
+            } else {
+                Log.d("ProfileFragment", "Local backup file does not exist.");
+            }
+        } catch (Exception e) {
+            Log.e("ProfileFragment", "Error clearing local data: " + e.getMessage(), e);
+        }
     }
 }

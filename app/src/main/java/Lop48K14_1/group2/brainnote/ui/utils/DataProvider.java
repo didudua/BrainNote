@@ -54,7 +54,6 @@ public class DataProvider {
     public static void clearData() {
         notebooks.clear();
     }
-
     // Chuyển đổi dữ liệu sang JSON
     public static String getDataAsJson() {
         try {

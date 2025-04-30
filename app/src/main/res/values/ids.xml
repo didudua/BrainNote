@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fragment containers -->
+    <item name="fragment_container" type="id" />
+    
+    <!-- Task list view IDs -->
+    <item name="incomplete_tasks_header" type="id" />
+    <item name="completed_tasks_header" type="id" />
+    <item name="search_edit_text" type="id" />
+    <item name="add_task_button" type="id" />
+    <item name="btn_filter" type="id" />
+    
+    <!-- Task edit/add view IDs -->
+    <item name="task_title_edit_text" type="id" />
+    <item name="task_description_edit_text" type="id" />
+    <item name="date_chip_group" type="id" />
+    <item name="priority_chip_group" type="id" />
+    <item name="reminder_chip_group" type="id" />
+    <item name="save_button" type="id" />
+    <item name="close_button" type="id" />
+    <item name="flag_button" type="id" />
+    <item name="header_title" type="id" />
+    <item name="task_radio_button" type="id" />
+    
+    <!-- Chip IDs -->
+    <item name="chip_today" type="id" />
+    <item name="chip_tomorrow" type="id" />
+    <item name="chip_custom" type="id" />
+    <item name="chip_one_hour" type="id" />
+    <item name="chip_four_hours" type="id" />
+    <item name="chip_custom_reminder" type="id" />
+    <item name="chip_low" type="id" />
+    <item name="chip_medium" type="id" />
+    <item name="chip_high" type="id" />
+</resources>

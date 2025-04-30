@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/view_mode_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_view_mode"
+        android:drawablePadding="16dp"
+        android:padding="12dp"
+        android:text="@string/view_mode"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/sort_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_sort"
+        android:drawablePadding="16dp"
+        android:padding="12dp"
+        android:text="@string/sort_by"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/filter_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_filter"
+        android:drawablePadding="16dp"
+        android:padding="12dp"
+        android:text="@string/filter"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/settings_option"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_settings"
+        android:drawablePadding="16dp"
+        android:padding="12dp"
+        android:text="@string/settings"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+</LinearLayout>
