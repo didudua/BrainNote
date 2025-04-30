@@ -1,0 +1,55 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Background -->
+    <path
+        android:fillColor="#F5F5F5"
+        android:pathData="M0,0h200v200h-200z"/>
+    
+    <!-- Character body -->
+    <path
+        android:fillColor="#FFEB3B"
+        android:pathData="M100,70m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0"/>
+    
+    <!-- Character face -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M90,65m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M110,65m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M100,75Q110,85 100,85Q90,85 100,75"/>
+    
+    <!-- Task card -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,110h80v40h-80z"
+        android:strokeColor="#CCCCCC"
+        android:strokeWidth="2"/>
+    
+    <!-- Checkbox -->
+    <path
+        android:fillColor="#9C27B0"
+        android:pathData="M75,130m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,130L73,133L80,126"/>
+    
+    <!-- Task line -->
+    <path
+        android:strokeColor="#CCCCCC"
+        android:strokeWidth="2"
+        android:pathData="M90,130h40"/>
+    
+    <!-- Character arms -->
+    <path
+        android:fillColor="#FFEB3B"
+        android:pathData="M70,70C60,80 60,90 70,100"/>
+    <path
+        android:fillColor="#FFEB3B"
+        android:pathData="M130,70C140,80 140,90 130,100"/>
+</vector>

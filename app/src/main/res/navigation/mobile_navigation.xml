@@ -48,9 +48,39 @@
     </fragment>
     <fragment
         android:id="@+id/nav_tasks"
-        android:name="Lop48K14_1.group2.brainnote.ui.Home.TaskFragment"
+        android:name="Lop48K14_1.group2.brainnote.ui.Tasks.TasksFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_task" />
+        tools:layout="@layout/fragment_task">
+        <action
+            android:id="@+id/action_tasksFragment_to_addTaskFragment"
+            app:destination="@id/addTaskFragment"
+            app:popUpTo="@id/nav_tasks" />
+        <action
+            android:id="@+id/action_tasksFragment_to_editTaskFragment"
+            app:destination="@id/editTaskFragment"
+            app:popUpTo="@id/nav_tasks" />
+        <action
+            android:id="@+id/action_tasksFragment_to_filterTasksFragment"
+            app:destination="@id/filterTasksFragment"
+            app:popUpTo="@id/nav_tasks" />
+    </fragment>
+    <fragment
+        android:id="@+id/addTaskFragment"
+        android:name="Lop48K14_1.group2.brainnote.ui.Tasks.AddTaskFragment"
+        android:label="AddTaskFragment" />
+    <fragment
+        android:id="@+id/editTaskFragment"
+        android:name="Lop48K14_1.group2.brainnote.ui.Tasks.EditTaskFragment"
+        tools:layout="@layout/fragment_edit_task">
+        <argument
+            android:name="task_id"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/filterTasksFragment"
+        android:name="Lop48K14_1.group2.brainnote.ui.Tasks.FilterTasksFragment"
+        android:label="FilterTasksFragment"
+        tools:layout="@layout/fragment_filter_tasks" />
     <fragment
         android:id="@+id/nav_newnotebook"
         android:name="Lop48K14_1.group2.brainnote.ui.Notebook.NewNotebookFragment"
@@ -76,10 +106,7 @@
         <action
             android:id="@+id/action_profileFragment_to_homeFragment"
             app:destination="@id/nav_create" />
-
-
     </fragment>
-
 
     <fragment
         android:id="@+id/nav_notification"

@@ -19,6 +19,7 @@ import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 import Lop48K14_1.group2.brainnote.ui.Home.HomeFragment;
 import Lop48K14_1.group2.brainnote.ui.Login.WelcomeFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
+import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -35,7 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             if (currentUser != null) {
-                // Đồng bộ dữ liệu với Firebase trước
+                // Làm mới DataProvider trước khi đồng bộ
+                DataProvider.clearData();
                 syncNotebooksToFirebase(currentUser);
             } else {
                 // Chưa đăng nhập → load WelcomeFragment

@@ -35,6 +35,7 @@ import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.Home.HomeFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
+import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -130,6 +131,8 @@ public class LoginPasswordFragment extends Fragment {
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
+                                // Làm mới dữ liệu sau khi đăng ký tài khoản mới
+                                DataProvider.clearData();
                                 Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
                                 ((MainActivity) requireActivity()).loadFragment(new LoginFragment());
                             } else {
@@ -182,14 +185,13 @@ public class LoginPasswordFragment extends Fragment {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
+                        // Làm mới dữ liệu trước khi chuyển sang MainHomeActivity
+                        DataProvider.clearData();
                         FirebaseUser user = mAuth.getCurrentUser();
                         saveEmail(user.getEmail());
                         Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-
-                        // Chuyển sang MainActivity
                         Intent intent = new Intent(getActivity(), MainHomeActivity.class);
                         startActivity(intent);
-
                     } else {
                         Toast.makeText(getContext(), "Xác thực Firebase thất bại", Toast.LENGTH_SHORT).show();
                     }

@@ -37,4 +37,10 @@
     <color name="medium_gray">#757575</color>
     <color name="light_gray">#E0E0E0</color>
     <color name="white_transparent">#80FFFFFF</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray">#757575</color>
+    <color name="red">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="yellow">#FFC107</color>
 </resources>
