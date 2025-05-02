@@ -39,6 +39,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 import Lop48K14_1.group2.brainnote.ui.Login.LoginFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
 
@@ -115,22 +116,11 @@ public class PopupLoginFragment extends BottomSheetDialogFragment {
                 Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(!login){
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
-                                ((MainActivity) requireActivity()).loadFragment(new LoginFragment());
-                            } else {
-                                Toast.makeText(getContext(), "Không thể tạo tài khoản: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-            }
-            else{
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 saveEmail(email);
+                                JsonSyncManager.uploadNotebooksToFirebase();
                                 Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), MainHomeActivity.class);
                                 startActivity(intent);
@@ -139,7 +129,6 @@ public class PopupLoginFragment extends BottomSheetDialogFragment {
                                 Toast.makeText(getContext(), "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
                             }
                         });
-            }
         });
 
         googleButton.setOnClickListener(v -> {
