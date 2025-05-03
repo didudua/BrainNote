@@ -39,9 +39,11 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 import Lop48K14_1.group2.brainnote.ui.Login.LoginFragment;
 import Lop48K14_1.group2.brainnote.ui.Login.LoginPasswordFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
+import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
 
 public class PopupLogin_RegisterFragment extends BottomSheetDialogFragment {
@@ -82,9 +84,6 @@ public class PopupLogin_RegisterFragment extends BottomSheetDialogFragment {
         Button continueButton = view.findViewById(R.id.continue_button);
         CardView googleButton = (CardView) view.findViewById(R.id.googleSignInButton);
 
-        TextView welcomeTextView = view.findViewById(R.id.welcomeText);
-        TextView mainTitle = view.findViewById(R.id.mainTitle);
-        TextView haveAccount = view.findViewById(R.id.have_Account);
         TextView signupText = view.findViewById(R.id.signup_text);
 
 
@@ -104,29 +103,31 @@ public class PopupLogin_RegisterFragment extends BottomSheetDialogFragment {
                 passwordEditText.requestFocus();
                 return;
             }
-            mAuth.signOut();
 
             clearLocalUserData();
             // Đăng ký tài khoản mới Firebase
             mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(requireActivity(), task -> {
+                    .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            saveEmail(user.getEmail());
+                            // Làm mới dữ liệu sau khi đăng ký tài khoản mới
+                            DataProvider.clearData();
+                            JsonSyncManager.uploadNotebooksToFirebase();
+                            Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
 
-                            Toast.makeText(getContext(), "Thêm tài khoản mới thành công: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("email", email);
+                            bundle.putBoolean("login", true); // chế độ đăng nhập
 
-                            // Quan trọng: Sau khi đăng ký -> chuyển thẳng vào Home (MainHomeActivity)
-                            Intent intent = new Intent(getActivity(), MainHomeActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa hết stack trước đó
-                            startActivity(intent);
+                            PopupLoginFragment loginFragment = new PopupLoginFragment();
+                            loginFragment.setArguments(bundle);
+                            loginFragment.show(getParentFragmentManager(), "PopupLogin");
 
-                            dismiss(); // đóng popup sau khi thêm tài khoản xong
-                        } else {
-                            Toast.makeText(getContext(), "Lỗi khi thêm tài khoản: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            Log.e("REGISTER_ERROR", "Error: ", task.getException());
+                        }
+                        else {
+                            Toast.makeText(getContext(), "Không thể tạo tài khoản: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
+
         });
 
         googleButton.setOnClickListener(v -> {
