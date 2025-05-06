@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     android:orientation="vertical">
 
@@ -60,7 +60,8 @@
                 android:id="@+id/task_radio_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="@color/purple_500" />
+                android:buttonTint="@color/purple_500"
+                android:enabled="true" />
 
             <EditText
                 android:id="@+id/task_title_edit_text"
@@ -212,7 +213,8 @@
                     android:id="@+id/priority_chip_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp">
+                    android:layout_marginStart="16dp"
+                    app:singleSelection="true">
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_low"

@@ -1,6 +1,7 @@
 package Lop48K14_1.group2.brainnote.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -156,6 +159,15 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         holder.taskCheckbox.setChecked(isCompleted);
 
+        // Set background color based on priority
+        int priority = task.getPriority();
+        if (priority == 2) { // High priority
+            holder.taskContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.high_priority_background));
+        } else if (priority == 1) { // Medium priority
+            holder.taskContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.medium_priority_background));
+        } else { // Low priority
+            holder.taskContainer.setBackgroundColor(Color.TRANSPARENT);
+        }
         holder.taskCheckbox.setOnClickListener(v -> {
             int adapterPosition = holder.getAdapterPosition();
             if (adapterPosition != RecyclerView.NO_POSITION) {
@@ -195,11 +207,13 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         RadioButton taskCheckbox;
         TextView taskTitle;
+        ConstraintLayout taskContainer;
 
         TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             taskCheckbox = itemView.findViewById(R.id.task_checkbox);
             taskTitle = itemView.findViewById(R.id.task_title);
+            taskContainer = itemView.findViewById(R.id.task_container);
         }
     }
 }

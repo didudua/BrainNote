@@ -217,4 +217,16 @@ public class TasksFragment extends Fragment {
             tasksRef.removeEventListener(tasksListener);
         }
     }
+
+    public TaskAdapter getTaskAdapter() {
+        return taskAdapter;
+    }
+
+    public List<Task> getIncompleteTasks() {
+        return incompleteTasks;
+    }
+
+    public List<Task> getCompletedTasks() {
+        return completedTasks;
+    }
 }
