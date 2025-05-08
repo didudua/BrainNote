@@ -11,8 +11,8 @@
     <!-- Ảnh đại diện -->
     <ImageView
         android:id="@+id/avatarImageView"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:src="@drawable/img"
         android:scaleType="centerCrop"
         android:contentDescription="Avatar người dùng" />
