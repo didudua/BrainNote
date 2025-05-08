@@ -1,66 +1,164 @@
 package Lop48K14_1.group2.brainnote.ui.Home;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.ui.adapters.TrashNotebookAdapter;
+import Lop48K14_1.group2.brainnote.ui.models.Note;
+import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TrashCanFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class TrashCanFragment extends Fragment {
+public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.OnTrashItemClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public TrashCanFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TrashCanFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TrashCanFragment newInstance(String param1, String param2) {
-        TrashCanFragment fragment = new TrashCanFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private RecyclerView recyclerView;
+    private TrashNotebookAdapter adapter;
+    private List<Notebook> deletedNotebooks = new ArrayList<>();
+    private DatabaseReference trashRef;
+    private DatabaseReference notebooksRef;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_trash_can, container, false);
+        // Inflate the fragment layout
+        View rootView = inflater.inflate(R.layout.fragment_trash_can, container, false);
+
+        // Initialize RecyclerView
+        recyclerView = rootView.findViewById(R.id.recyclerViewTrashNotebooks);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Set up the adapter with the listener
+        adapter = new TrashNotebookAdapter(getContext(), deletedNotebooks, this);
+        recyclerView.setAdapter(adapter);
+
+        // Get Firebase reference for trash and notebooks
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        trashRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("trash").child("notebooks");
+        notebooksRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("notebooks");
+
+        ImageButton btnBack = rootView.findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_trashFragment_to_homeFragment);
+        });
+
+        // Load deleted notebooks from Firebase
+        loadDeletedNotebooks();
+
+        return rootView;
+    }
+
+    private void loadDeletedNotebooks() {
+        // Add a listener to load deleted notebooks from Firebase
+        trashRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                deletedNotebooks.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Notebook notebook = snapshot.getValue(Notebook.class);
+                    if (notebook != null) {
+                        deletedNotebooks.add(notebook);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle database error
+            }
+        });
+    }
+
+    @Override
+    public void onRestore(Notebook notebook) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        // 1. Lấy backup_json hiện tại
+        userRef.child("backup_json").get().addOnSuccessListener(snapshot -> {
+            try {
+                String jsonString = snapshot.getValue(String.class);
+                JSONObject jsonObject = new JSONObject(jsonString);
+                JSONArray notebooksArray = jsonObject.getJSONArray("notebooks");
+
+                // 2. Tạo JSONObject từ notebook
+                JSONObject restoredNotebook = new JSONObject();
+                restoredNotebook.put("id", notebook.getId());
+                restoredNotebook.put("name", notebook.getName());
+
+                JSONArray notesArray = new JSONArray();
+                if (notebook.getNotes() != null) {
+                    for (Note note : notebook.getNotes()) {
+                        JSONObject noteJson = new JSONObject();
+                        noteJson.put("id", note.getId());
+                        noteJson.put("title", note.getTitle());
+                        noteJson.put("content", note.getContent());
+                        noteJson.put("date", note.getDate());
+                        noteJson.put("notebookId", note.getNotebookId());
+                        notesArray.put(noteJson);
+                    }
+                }
+
+                restoredNotebook.put("notes", notesArray);
+                notebooksArray.put(restoredNotebook);
+
+                // 3. Ghi lại backup_json mới
+                userRef.child("backup_json").setValue(jsonObject.toString());
+
+                // 4. Xóa khỏi trash
+                userRef.child("trash").child("notebooks").child(notebook.getId()).removeValue();
+
+                // 5. Thông báo
+                Toast.makeText(getContext(), "Sổ tay đã được khôi phục", Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Lỗi khi khôi phục sổ tay", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onDeletePermanently(Notebook notebook) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận xóa vĩnh viễn")
+                .setMessage("Bạn có chắc muốn xóa vĩnh viễn sổ tay \"" + notebook.getName() + "\"? Hành động này không thể hoàn tác.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+                    // Xóa khỏi trash
+                    userRef.child("trash").child("notebooks").child(notebook.getId()).removeValue();
+
+                    Toast.makeText(getContext(), "Sổ tay đã bị xóa vĩnh viễn", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 }

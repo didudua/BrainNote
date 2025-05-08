@@ -228,4 +228,14 @@ public class JsonSyncManager {
             Log.e(TAG, "JSON parsing error: " + e.getMessage(), e);
         }
     }
+
+    public static void moveNotebookToTrash(Context context, Notebook notebook) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+
+        userRef.child("trash").child("notebooks").child(notebook.getId()).setValue(notebook);
+        userRef.child("notebooks").child(notebook.getId()).removeValue();
+    }
+
 }

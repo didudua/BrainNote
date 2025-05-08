@@ -15,6 +15,10 @@ public class Note {
         this.noteBookId = noteBookId;
     }
 
+    public Note() {
+        // Required by Firebase
+    }
+
     public String getId() {
         return id;
     }
@@ -47,9 +51,11 @@ public class Note {
         this.date = date;
     }
 
-    public String getNotebookId(){return noteBookId;}
+    public String getNotebookId() {
+        return noteBookId;
+    }
 
-    public void setNoteBookId(String noteBookId) {
-        this.noteBookId = noteBookId;
+    public void setNotebookId(String notebookId) {
+        this.noteBookId = notebookId;
     }
 }

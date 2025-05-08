@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="2dp"
-    android:background="@drawable/task_background"
     android:padding="12dp">
 
     <RadioButton

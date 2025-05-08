@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,20 +38,16 @@ public class TrashNotebookAdapter extends RecyclerView.Adapter<TrashNotebookAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Get the notebook data at the current position
         Notebook notebook = deletedNotebooks.get(position);
         holder.nameTextView.setText(notebook.getName());
-        holder.countTextView.setText(String.valueOf(notebook.getNotes().size()));
 
-        // Setup listener for the recover button
-        holder.recoverButton.setOnClickListener(v -> {
-            listener.onRestore(notebook);
-        });
 
-        // Setup listener for the delete button
-        holder.deleteButton.setOnClickListener(v -> {
-            listener.onDeletePermanently(notebook);
-        });
+        List<?> notes = notebook.getNotes();
+        int count = (notes != null) ? notes.size() : 0;
+        holder.countTextView.setText(String.valueOf(count));
+
+        holder.recoverButton.setOnClickListener(v -> listener.onRestore(notebook));
+        holder.deleteButton.setOnClickListener(v -> listener.onDeletePermanently(notebook));
     }
 
     @Override

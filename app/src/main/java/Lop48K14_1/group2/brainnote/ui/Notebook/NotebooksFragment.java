@@ -28,6 +28,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.core.Context;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -321,6 +325,10 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
                 .setTitle("Xác nhận xóa")
                 .setMessage("Bạn có chắc muốn xóa sổ tay \"" + notebook.getName() + "\"? Hành động này không thể hoàn tác.")
                 .setPositiveButton("Xóa", (dialog, which) -> {
+                    // Di chuyển vào Trash thay vì xóa hoàn toàn
+                    JsonSyncManager.moveNotebookToTrash(requireContext(), notebook);
+
+                    // Cập nhật UI
                     notebooks.remove(notebook);
                     filteredNotebooks.remove(position);
                     adapter.notifyItemRemoved(position);
@@ -328,12 +336,12 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
 
                     JsonSyncManager.saveNotebooksToFile(requireContext());
                     JsonSyncManager.uploadNotebooksToFirebase();
-                    Toast.makeText(getContext(), "Đã xóa sổ tay", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Sổ tay đã được chuyển vào thùng rác", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("Hủy", (dialog, which) -> {})
-                .setCancelable(true)
+                .setNegativeButton("Hủy", null)
                 .show();
     }
+
 
     @Override
     public void onResume() {
