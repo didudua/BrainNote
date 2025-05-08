@@ -2,6 +2,8 @@ package Lop48K14_1.group2.brainnote.ui.Tasks;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -98,6 +100,18 @@ public class TasksFragment extends Fragment {
         // Set up click listeners
         filterButton.setOnClickListener(v -> openFilterTasksFragment());
         moreButton.setOnClickListener(v -> showMoreOptions());
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                filterTasks(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
 
         // Load tasks from Firebase
         loadTasks();
@@ -172,7 +186,24 @@ public class TasksFragment extends Fragment {
             completedTasksHeader.setText(getString(R.string.completed_tasks_format, completedTasks.size()));
         }
     }
+    private void filterTasks(String query) {
+        List<Task> filteredIncompleteTasks = new ArrayList<>();
+        List<Task> filteredCompletedTasks = new ArrayList<>();
 
+        for (Task task : incompleteTasks) {
+            if (task.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                filteredIncompleteTasks.add(task);
+            }
+        }
+
+        for (Task task : completedTasks) {
+            if (task.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                filteredCompletedTasks.add(task);
+            }
+        }
+
+        taskAdapter.updateTasks(filteredIncompleteTasks, filteredCompletedTasks);
+    }
     private void onTaskStatusChanged(Task task, boolean isCompleted) {
         if (tasksRef == null || task == null || task.getId() == null) {
             Log.e("TasksFragment", "Invalid task or database reference");

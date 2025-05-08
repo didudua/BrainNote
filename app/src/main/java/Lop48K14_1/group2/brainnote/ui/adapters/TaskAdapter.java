@@ -216,4 +216,10 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             taskContainer = itemView.findViewById(R.id.task_container);
         }
     }
+    public void updateTasks(List<Task> incompleteTasks, List<Task> completedTasks) {
+        this.incompleteTasks = incompleteTasks;
+        this.completedTasks = completedTasks;
+        notifyDataSetChanged();
+    }
+
 }
