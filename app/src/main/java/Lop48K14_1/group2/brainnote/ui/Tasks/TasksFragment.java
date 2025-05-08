@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.ui.Home.HeaderFragment;
 import Lop48K14_1.group2.brainnote.ui.adapters.TaskAdapter;
 import Lop48K14_1.group2.brainnote.ui.models.Task;
 
@@ -83,7 +84,6 @@ public class TasksFragment extends Fragment {
         addTaskButton = view.findViewById(R.id.add_task_button);
         filterButton = view.findViewById(R.id.btn_filter);
         moreButton = view.findViewById(R.id.btn_more);
-        avatarImageView = view.findViewById(R.id.avatar_image_view);
 
         // Check for null views
         if (incompleteTasksHeader == null || completedTasksHeader == null) {
@@ -109,7 +109,11 @@ public class TasksFragment extends Fragment {
                 Toast.makeText(getContext(), "Cannot navigate to Add Task", Toast.LENGTH_SHORT).show();
             }
         });
-
+        if (savedInstanceState == null) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.headerContainer, new HeaderFragment())
+                    .commit();
+        }
         return view;
     }
 
@@ -212,5 +216,17 @@ public class TasksFragment extends Fragment {
         if (tasksRef != null && tasksListener != null) {
             tasksRef.removeEventListener(tasksListener);
         }
+    }
+
+    public TaskAdapter getTaskAdapter() {
+        return taskAdapter;
+    }
+
+    public List<Task> getIncompleteTasks() {
+        return incompleteTasks;
+    }
+
+    public List<Task> getCompletedTasks() {
+        return completedTasks;
     }
 }

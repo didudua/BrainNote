@@ -34,7 +34,7 @@
     <string name="in_four_hours">Trong 4 giờ nữa</string>
     <string name="low_priority">Thấp</string>
     <string name="medium_priority">Trung bình</string>
-    <string name="high_priority">Thấp</string>
+    <string name="high_priority">Cao</string>
     <string name="flag_task">Đánh dấu</string>
 
     <!-- Filter Options -->
@@ -45,7 +45,7 @@
     <string name="priority">Độ ưu tiên</string>
     <string name="low">Thấp</string>
     <string name="medium">Trung bình</string>
-    <string name="high">Thấp</string>
+    <string name="high">Cao</string>
 
     <!-- Task Options -->
     <string name="view_mode">Chế độ xem</string>

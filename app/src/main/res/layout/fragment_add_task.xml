@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     android:orientation="vertical">
 
@@ -60,7 +60,8 @@
                 android:id="@+id/task_radio_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="@color/purple_500" />
+                android:buttonTint="@color/purple_500"
+                android:enabled="true" />
 
             <EditText
                 android:id="@+id/task_title_edit_text"
@@ -122,33 +123,48 @@
                     android:layout_marginTop="8dp"
                     android:src="@drawable/ic_calendar" />
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/date_chip_group"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp">
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_today"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/date_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_today"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/today" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_tomorrow"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/tomorrow" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_custom"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/custom" />
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <TextView
+                        android:id="@+id/selected_date_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/today" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_tomorrow"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tomorrow" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_custom"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/custom" />
-                </com.google.android.material.chip.ChipGroup>
+                        android:layout_marginTop="8dp"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Reminder Options -->
@@ -165,33 +181,48 @@
                     android:layout_marginTop="8dp"
                     android:src="@drawable/ic_alarm" />
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/reminder_chip_group"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp">
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_one_hour"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/reminder_chip_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_one_hour"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/in_one_hour" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_four_hours"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/in_four_hours" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_custom_reminder"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/custom" />
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <TextView
+                        android:id="@+id/selected_reminder_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/in_one_hour" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_four_hours"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/in_four_hours" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_custom_reminder"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/custom" />
-                </com.google.android.material.chip.ChipGroup>
+                        android:layout_marginTop="8dp"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Priority Options -->
@@ -212,7 +243,8 @@
                     android:id="@+id/priority_chip_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp">
+                    android:layout_marginStart="16dp"
+                    app:singleSelection="true">
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_low"
@@ -242,7 +274,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
 
                 <ImageView
                     android:id="@+id/flag_button"

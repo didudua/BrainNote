@@ -43,4 +43,7 @@
     <color name="red">#F44336</color>
     <color name="green">#4CAF50</color>
     <color name="yellow">#FFC107</color>
+    <color name="checkbox_tint">#6DB9BA</color> <!-- A modern purple tint for the checkbox -->
+    <color name="high_priority_background">#FFC5C5</color> <!-- Light red for high priority -->
+    <color name="medium_priority_background">#FDF7DD</color> <!-- Light yellow for medium priority -->
 </resources>
