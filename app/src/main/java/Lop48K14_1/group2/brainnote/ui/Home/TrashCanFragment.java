@@ -30,17 +30,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.ui.adapters.TrashNoteAdapter;
 import Lop48K14_1.group2.brainnote.ui.adapters.TrashNotebookAdapter;
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 
 public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.OnTrashItemClickListener {
 
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, noterecyclerView;
     private TrashNotebookAdapter adapter;
+    private TrashNoteAdapter noteadapter;
     private List<Notebook> deletedNotebooks = new ArrayList<>();
+    private List<Note> deletedNotes = new ArrayList<>();
     private DatabaseReference trashRef;
-    private DatabaseReference notebooksRef;
+    private DatabaseReference notebooksRef, trashNotesRef;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -52,14 +55,20 @@ public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.O
         recyclerView = rootView.findViewById(R.id.recyclerViewTrashNotebooks);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        noterecyclerView = rootView.findViewById(R.id.recyclerViewTrashNotes);
+        noterecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // Set up the adapter with the listener
         adapter = new TrashNotebookAdapter(getContext(), deletedNotebooks, this);
         recyclerView.setAdapter(adapter);
+
+        noteadapter = new TrashNoteAdapter(getContext(), deletedNotes, this);
+        noterecyclerView.setAdapter(noteadapter);
 
         // Get Firebase reference for trash and notebooks
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         trashRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("trash").child("notebooks");
         notebooksRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("notebooks");
+        trashNotesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("trash").child("notes");
 
         ImageButton btnBack = rootView.findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
