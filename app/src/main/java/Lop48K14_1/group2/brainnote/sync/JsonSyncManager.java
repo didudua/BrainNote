@@ -175,7 +175,6 @@ public class JsonSyncManager {
                         Log.d(TAG, "Data imported from local file");
                         callback.onSuccess();
                     }
-
                     @Override
                     public void onFailure(Exception e) {
                         Log.e(TAG, "Import failed from both Firebase and local file: " + e.getMessage());

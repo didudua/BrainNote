@@ -90,17 +90,6 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
         }
     }
 
-    private boolean isDataLoaded = false;
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!isDataLoaded) {
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                loadNotes();
-            }, 500);
-        }
-    }
 
     private void loadNotes() {
         JsonSyncManager.importDataWithFallback(getContext(), new JsonSyncManager.OnDataImported() {
@@ -115,14 +104,12 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
                 noteAdapter = new NoteAdapter(notes, NotesFragment.this, NotesFragment.this);
                 recyclerView.setAdapter(noteAdapter);
                 updateNoteCount(noteAdapter.getItemCount());
-                isDataLoaded = true; // Đánh dấu dữ liệu đã được tải
             }
 
             @Override
             public void onFailure(Exception e) {
                 Log.e("NotesFragment", "Failed to load notes", e);
                 Toast.makeText(getContext(), "Không thể tải dữ liệu ghi chú. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-                isDataLoaded = false; // Cho phép thử lại nếu thất bại
             }
         });
     }
@@ -151,7 +138,7 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
                                 notes.remove(note);
                                 noteAdapter.notifyItemRemoved(position);
                                 updateNoteCount(noteAdapter.getItemCount());
-                                isDataLoaded = false; // Cho phép reload dữ liệu ở lần onResume tiếp theo
+                                loadNotes();
                             },
                             () -> {
                                 // Thất bại: Làm mới UI để phản ánh dữ liệu thực tế
@@ -162,5 +149,11 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadNotes();
     }
 }
