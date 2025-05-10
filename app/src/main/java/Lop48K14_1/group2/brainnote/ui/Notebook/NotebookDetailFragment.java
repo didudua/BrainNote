@@ -1,5 +1,6 @@
 package Lop48K14_1.group2.brainnote.ui.Notebook;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,13 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
-import Lop48K14_1.group2.brainnote.ui.Notes.NotesFragment;
 import Lop48K14_1.group2.brainnote.ui.adapters.NoteAdapter;
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 
-public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNoteClickListener {
+public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNoteClickListener, NoteAdapter.OnNoteDeleteListener {
 
     private RecyclerView recyclerView;
     private NoteAdapter adapter;
@@ -77,17 +79,6 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         // Thiết lập tiêu đề
         titleTextView.setText(notebook.getName());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Initialize search EditText
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (adapter != null) {
-                    adapter.getFilter().filter(s);
-                    updateNoteCount();
-                }
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
 
         // Lấy dữ liệu
         notes = notebook.getNotes();
@@ -95,7 +86,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         Log.d("NotebookDetailFragment", "Number of notes: " + notes.size());
 
         // Thiết lập adapter
-        adapter = new NoteAdapter(filteredNotes, this, (NoteAdapter.OnNoteDeleteListener) this);
+        adapter = new NoteAdapter(filteredNotes, this, this);
         recyclerView.setAdapter(adapter);
 
         // Cập nhật số lượng ghi chú
@@ -127,9 +118,10 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
 
         // Thiết lập nút thêm mới
         addButton.setOnClickListener(v -> {
-            args.putString("NOTEBOOK_ID", notebookId);
+            Bundle argsNew = new Bundle();
+            argsNew.putString("NOTEBOOK_ID", notebookId);
             NavController nav = NavHostFragment.findNavController(NotebookDetailFragment.this);
-            nav.navigate(R.id.action_notebookDetailFragment_to_nav_new_note, args);
+            nav.navigate(R.id.action_notebookDetailFragment_to_nav_new_note, argsNew);
         });
 
         return view;
@@ -138,7 +130,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     private void filterNotes(String query) {
         filteredNotes.clear();
 
-        if (query.isEmpty()) {
+        if (query == null || query.isEmpty()) {
             filteredNotes.addAll(notes);
         } else {
             query = query.toLowerCase();
@@ -155,7 +147,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     }
 
     private void updateNoteCount() {
-        if (filteredNotes.isEmpty()) {
+        if (filteredNotes == null || filteredNotes.isEmpty()) {
             noteCountTextView.setText("Không có ghi chú nào");
         } else {
             noteCountTextView.setText(filteredNotes.size() + " ghi chú");
@@ -164,6 +156,11 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
 
     @Override
     public void onNoteClick(Note clickedNote) {
+        if (clickedNote == null) {
+            Log.e("NotebookDetailFragment", "Clicked note is null");
+            Toast.makeText(getContext(), "Ghi chú không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Bundle args = new Bundle();
         args.putString("NOTEBOOK_ID", clickedNote.getNotebookId());
         args.putString("NOTE_ID", clickedNote.getId());
@@ -172,19 +169,60 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     }
 
     @Override
+    public void onNoteDelete(Note note, int position) {
+        if (note == null) {
+            Log.e("NotebookDetailFragment", "Note to delete is null");
+            Toast.makeText(getContext(), "Ghi chú không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc muốn xóa ghi chú \"" + note.getTitle() + "\"? Hành động này sẽ chuyển ghi chú vào thùng rác.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    JsonSyncManager.moveNoteToTrash(
+                            requireContext(),
+                            note,
+                            () -> {
+                                // Cập nhật UI
+                                notes.remove(note);
+                                filteredNotes.remove(position);
+                                adapter.notifyItemRemoved(position);
+                                updateNoteCount();
+                                Toast.makeText(getContext(), "Ghi chú đã được chuyển vào thùng rác", Toast.LENGTH_SHORT).show();
+                            },
+                            () -> {
+                                adapter.notifyDataSetChanged();
+                                Toast.makeText(requireContext(), "Không thể xóa ghi chú, vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                            }
+                    );
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         // Cập nhật lại dữ liệu khi quay lại fragment
         notebook = DataProvider.getNotebookById(notebookId);
         if (notebook != null) {
-            notes = notebook.getNotes();
+            notes.clear();
+            notes.addAll(notebook.getNotes());
             if (searchEditText != null && searchEditText.getText() != null) {
                 filterNotes(searchEditText.getText().toString());
             } else {
                 filteredNotes.clear();
                 filteredNotes.addAll(notes);
-                adapter.notifyDataSetChanged();
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                }
                 updateNoteCount();
+            }
+        } else {
+            Log.e("NotebookDetailFragment", "Notebook not found in onResume for ID: " + notebookId);
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         }
     }
