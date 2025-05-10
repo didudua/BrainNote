@@ -90,6 +90,18 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
         }
     }
 
+    private boolean isDataLoaded = false;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isDataLoaded) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                loadNotes();
+            }, 500);
+        }
+    }
+
     private void loadNotes() {
         JsonSyncManager.importDataWithFallback(getContext(), new JsonSyncManager.OnDataImported() {
             @Override
@@ -100,15 +112,17 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
                     notes.addAll(notebook.getNotes());
                 }
 
-                noteAdapter = new NoteAdapter(notes, NotesFragment.this, NotesFragment.this); // Pass both listeners
+                noteAdapter = new NoteAdapter(notes, NotesFragment.this, NotesFragment.this);
                 recyclerView.setAdapter(noteAdapter);
                 updateNoteCount(noteAdapter.getItemCount());
+                isDataLoaded = true; // Đánh dấu dữ liệu đã được tải
             }
 
             @Override
             public void onFailure(Exception e) {
                 Log.e("NotesFragment", "Failed to load notes", e);
                 Toast.makeText(getContext(), "Không thể tải dữ liệu ghi chú. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                isDataLoaded = false; // Cho phép thử lại nếu thất bại
             }
         });
     }
@@ -126,22 +140,27 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
     public void onNoteDelete(Note note, int position) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Xác nhận xóa")
-                .setMessage("Bạn có chắc muốn xóa ghi chú \"" + note.getTitle() + "\"? Hành động này không thể hoàn tác.")
+                .setMessage("Bạn có chắc muốn xóa ghi chú \"" + note.getTitle() + "\"? Hành động này sẽ chuyển ghi chú vào thùng rác.")
                 .setPositiveButton("Xóa", (dialog, which) -> {
-                    // Xóa ghi chú khỏi Firebase hoàn toàn
-                    JsonSyncManager.moveNoteToTrash(requireContext(), note);
-                    // Cập nhật UI ngay lập tức
-                    noteAdapter.removeAt(position);
-                    updateNoteCount(noteAdapter.getItemCount());
-                    Toast.makeText(getContext(), "Ghi chú đã bị xóa hoàn toàn", Toast.LENGTH_SHORT).show();
+                    // Di chuyển ghi chú vào thùng rác
+                    JsonSyncManager.moveNoteToTrash(
+                            requireContext(),
+                            note,
+                            () -> {
+                                // Thành công: Cập nhật UI
+                                notes.remove(note);
+                                noteAdapter.notifyItemRemoved(position);
+                                updateNoteCount(noteAdapter.getItemCount());
+                                isDataLoaded = false; // Cho phép reload dữ liệu ở lần onResume tiếp theo
+                            },
+                            () -> {
+                                // Thất bại: Làm mới UI để phản ánh dữ liệu thực tế
+                                noteAdapter.notifyDataSetChanged();
+                                Toast.makeText(requireContext(), "Không thể xóa ghi chú, vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                            }
+                    );
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadNotes();
     }
 }

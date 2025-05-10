@@ -238,12 +238,65 @@ public class JsonSyncManager {
         userRef.child("trash").child("notebooks").child(notebook.getId()).setValue(notebook);
         userRef.child("notebooks").child(notebook.getId()).removeValue();
     }
-    public static void moveNoteToTrash(Context context, Note note) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    public static void moveNoteToTrash(Context context, Note note, Runnable onSuccessCallback, Runnable onFailureCallback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            runOnUiThread(context, () -> Toast.makeText(context, "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show());
+            if (onFailureCallback != null) onFailureCallback.run();
+            return;
+        }
+
+        String userId = user.getUid();
+        String notebookId = note.getNotebookId();
+        String noteId = note.getId();
+
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+        DatabaseReference noteRef = userRef.child("notebooks").child(notebookId).child("notes").child(noteId);
+        DatabaseReference trashRef = userRef.child("trash").child("notes").child(noteId);
 
         // Di chuyển ghi chú vào thùng rác
-        userRef.child("trash").child("notes").child(note.getId()).setValue(note);
+        trashRef.setValue(note)
+                .addOnSuccessListener(aVoid -> {
+                    // Xóa ghi chú khỏi danh sách chính
+                    noteRef.removeValue()
+                            .addOnSuccessListener(aVoid2 -> {
+                                Log.d(TAG, "Note moved to trash and removed from notebook successfully.");
+
+                                // Cập nhật DataProvider
+                                DataProvider.removeNote(note);
+
+                                // Lưu dữ liệu cục bộ
+                                saveNotebooksToFile(context);
+
+                                // Cập nhật backup_json trên Firebase
+                                uploadNotebooksToFirebase();
+
+                                // Thông báo thành công trên UI thread
+                                runOnUiThread(context, () -> {
+                                    Toast.makeText(context, "Ghi chú đã được chuyển vào thùng rác", Toast.LENGTH_SHORT).show();
+                                    if (onSuccessCallback != null) onSuccessCallback.run();
+                                });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error removing note from notebook: ", e);
+                                runOnUiThread(context, () -> {
+                                    Toast.makeText(context, "Không thể xóa ghi chú khỏi notebook: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    if (onFailureCallback != null) onFailureCallback.run();
+                                });
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error moving note to trash: ", e);
+                    runOnUiThread(context, () -> {
+                        Toast.makeText(context, "Không thể chuyển ghi chú vào thùng rác: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        if (onFailureCallback != null) onFailureCallback.run();
+                    });
+                });
+    }
+
+    // Helper method to run code on UI thread
+    private static void runOnUiThread(Context context, Runnable action) {
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(action);
     }
     public static void deleteNoteFromFirebase(Context context, Note note) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
