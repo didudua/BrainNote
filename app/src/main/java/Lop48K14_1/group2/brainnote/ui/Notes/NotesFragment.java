@@ -1,6 +1,7 @@
 package Lop48K14_1.group2.brainnote.ui.Notes;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,7 +33,8 @@ import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
-public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickListener {
+public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickListener, NoteAdapter.OnNoteDeleteListener {
+
     private List<Note> notes;
     private FloatingActionButton addButtonNote;
     private RecyclerView recyclerView;
@@ -44,12 +47,28 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notes, container, false);
 
-        // Setup RecyclerView
         recyclerView = view.findViewById(R.id.rvNotes);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Search
         searchEditText = view.findViewById(R.id.searchNote);
+        noteCount = view.findViewById(R.id.tvNoteCount);
+        addButtonNote = view.findViewById(R.id.addButtonNote);
+
+        addButtonNote.setOnClickListener(v -> {
+            Notebook defaultNb = DataProvider.getNotebooks().get(0);
+            Bundle args = new Bundle();
+            args.putString("NOTEBOOK_ID", defaultNb.getId());
+            NavController nav = NavHostFragment.findNavController(NotesFragment.this);
+            nav.navigate(R.id.action_nav_notes_to_nav_new_note, args);
+        });
+
+        setupSearchFunctionality();
+        loadNotes();
+
+        return view;
+    }
+
+    private void setupSearchFunctionality() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
@@ -61,23 +80,6 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
                 }
             }
         });
-
-        // Note count
-        noteCount = view.findViewById(R.id.tvNoteCount);
-
-        // Add new note button
-        addButtonNote = view.findViewById(R.id.addButtonNote);
-        addButtonNote.setOnClickListener(v -> {
-            Notebook defaultNb = DataProvider.getNotebooks().get(0);
-            Bundle args = new Bundle();
-            args.putString("NOTEBOOK_ID", defaultNb.getId());
-            NavController nav = NavHostFragment.findNavController(NotesFragment.this);
-            nav.navigate(R.id.action_nav_notes_to_nav_new_note, args);
-        });
-
-        // Load all notes
-        loadNotes();
-        return view;
     }
 
     private void updateNoteCount(int count) {
@@ -98,7 +100,7 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
                     notes.addAll(notebook.getNotes());
                 }
 
-                noteAdapter = new NoteAdapter(notes, NotesFragment.this);
+                noteAdapter = new NoteAdapter(notes, NotesFragment.this, NotesFragment.this); // Pass both listeners
                 recyclerView.setAdapter(noteAdapter);
                 updateNoteCount(noteAdapter.getItemCount());
             }
@@ -106,6 +108,7 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
             @Override
             public void onFailure(Exception e) {
                 Log.e("NotesFragment", "Failed to load notes", e);
+                Toast.makeText(getContext(), "Không thể tải dữ liệu ghi chú. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -117,6 +120,23 @@ public class NotesFragment extends Fragment implements NoteAdapter.OnNoteClickLi
         args.putString("NOTE_ID", clickedNote.getId());
         NavController nav = NavHostFragment.findNavController(this);
         nav.navigate(R.id.action_nav_notes_to_nav_note_detail, args);
+    }
+
+    @Override
+    public void onNoteDelete(Note note, int position) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc muốn xóa ghi chú \"" + note.getTitle() + "\"? Hành động này không thể hoàn tác.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    // Xóa ghi chú khỏi Firebase hoàn toàn
+                    JsonSyncManager.moveNoteToTrash(requireContext(), note);
+                    // Cập nhật UI ngay lập tức
+                    noteAdapter.removeAt(position);
+                    updateNoteCount(noteAdapter.getItemCount());
+                    Toast.makeText(getContext(), "Ghi chú đã bị xóa hoàn toàn", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     @Override

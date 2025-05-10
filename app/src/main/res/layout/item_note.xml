@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- item_note.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:background="@color/red"-->
+<!--        android:padding="8dp"-->
+<!--        android:layout_gravity="end">-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/btn_delete"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Xóa"-->
+<!--            android:textColor="@android:color/white"/>-->
+<!--    </LinearLayout>-->
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,31 +37,40 @@
             android:id="@+id/tvNoteTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:text="Tên ghi chú"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:text="Tên ghi chú" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvNoteContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@color/dark_gray"
             android:layout_marginTop="4dp"
-            android:text="Nội dung gồm đầu"
+            android:ellipsize="end"
             android:maxLines="2"
-            android:ellipsize="end"/>
+            android:text="Nội dung gồm đầu"
+            android:textColor="@color/dark_gray"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvNoteTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@color/dark_gray"
             android:layout_marginTop="4dp"
-            android:text="Thời gian" />
+            android:text="Thời gian"
+            android:textColor="@color/dark_gray"
+            android:textSize="12sp" />
     </LinearLayout>
+    <Button
+        android:layout_marginTop="10dp"
+        android:padding="10px"
+        android:id="@+id/btn_delete_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xóa"
+        android:textColor="@android:color/white"
+        android:background="@color/red"/>
 
     <View
         android:layout_width="match_parent"

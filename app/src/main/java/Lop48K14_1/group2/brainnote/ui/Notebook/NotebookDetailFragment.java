@@ -95,7 +95,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         Log.d("NotebookDetailFragment", "Number of notes: " + notes.size());
 
         // Thiết lập adapter
-        adapter = new NoteAdapter(filteredNotes, this);
+        adapter = new NoteAdapter(filteredNotes, this, (NoteAdapter.OnNoteDeleteListener) this);
         recyclerView.setAdapter(adapter);
 
         // Cập nhật số lượng ghi chú
