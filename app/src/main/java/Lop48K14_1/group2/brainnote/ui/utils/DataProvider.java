@@ -114,4 +114,15 @@ public class DataProvider {
             }
         }
     }
+
+    public static void removeNote(Note note) {
+        // Lọc qua tất cả các notebook để tìm và xóa note
+        for (Notebook notebook : notebooks) {
+            if (notebook.getNotes().contains(note)) {
+                notebook.getNotes().remove(note);
+                break; // Đã xóa thành công thì thoát khỏi vòng lặp
+            }
+        }
+    }
+
 }

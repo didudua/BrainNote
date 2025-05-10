@@ -1,10 +1,12 @@
 package Lop48K14_1.group2.brainnote.ui.adapters;
 
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     private List<Note> notes;
     private List<Note> notesFull;
     private OnNoteClickListener listener;
+    private OnNoteDeleteListener deleteListener;  // Lắng nghe sự kiện xóa
     private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy", Locale.getDefault());
 
     // Giao tiếp click vào note
@@ -33,8 +36,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         void onNoteClick(Note note);
     }
 
-    public NoteAdapter(List<Note> notes, OnNoteClickListener listener) {
+    public interface OnNoteDeleteListener {
+        void onNoteDelete(Note note, int position);
+    }
+
+    public NoteAdapter(List<Note> notes, OnNoteClickListener listener, OnNoteDeleteListener deleteListener) {
         this.listener = listener;
+        this.deleteListener = deleteListener; // Khởi tạo deleteListener
         this.notesFull = new ArrayList<>(notes);
         sortByDateDesc(notesFull);
         this.notes = new ArrayList<>(notesFull);
@@ -106,16 +114,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         });
     }
 
-    /**
-     * Lấy Note tại vị trí để xóa hoặc thao tác khác
-     */
     public Note getNoteAt(int position) {
         return notes.get(position);
     }
 
-    /**
-     * Xóa item khỏi adapter và thông báo thay đổi
-     */
     public void removeAt(int position) {
         notes.remove(position);
         notifyItemRemoved(position);
@@ -123,17 +125,30 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     public class NoteViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, contentTextView, dateTextView;
+        Button deleteNoteButton;
+
         public NoteViewHolder(@NonNull View v) {
             super(v);
-            titleTextView   = v.findViewById(R.id.tvNoteTitle);
+            titleTextView = v.findViewById(R.id.tvNoteTitle);
             contentTextView = v.findViewById(R.id.tvNoteContent);
-            dateTextView    = v.findViewById(R.id.tvNoteTime);
+            dateTextView = v.findViewById(R.id.tvNoteTime);
+            deleteNoteButton = v.findViewById(R.id.btn_delete_note);
+
             v.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION && listener != null) {
                     listener.onNoteClick(notes.get(pos));
                 }
             });
+
+            deleteNoteButton.setOnClickListener(view -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && deleteListener != null) {
+                    deleteListener.onNoteDelete(notes.get(pos), pos);
+                }
+
+            });
         }
     }
 }
+

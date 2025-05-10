@@ -2,6 +2,7 @@ package Lop48K14_1.group2.brainnote.sync;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -237,5 +238,66 @@ public class JsonSyncManager {
         userRef.child("trash").child("notebooks").child(notebook.getId()).setValue(notebook);
         userRef.child("notebooks").child(notebook.getId()).removeValue();
     }
+    public static void moveNoteToTrash(Context context, Note note) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        // Di chuyển ghi chú vào thùng rác
+        userRef.child("trash").child("notes").child(note.getId()).setValue(note);
+    }
+    public static void deleteNoteFromFirebase(Context context, Note note) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(context, "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String uid = user.getUid();
+        String notebookId = note.getNotebookId();
+        String noteId = note.getId();
+
+        DatabaseReference noteRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("users").child(uid)
+                .child("notebooks").child(notebookId)
+                .child("notes").child(noteId);
+
+        noteRef.removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Note deleted successfully from Firebase.");
+
+                    // 1. Xóa khỏi DataProvider
+                    DataProvider.removeNote(note);
+
+                    // 2. Lưu cache local
+                    saveNotebooksToFile(context);
+
+
+                    // 4. Thông báo thành công
+                    Toast.makeText(context, "Ghi chú đã bị xóa thành công", Toast.LENGTH_SHORT).show();
+
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error deleting note from Firebase: ", e);
+                    Toast.makeText(context,
+                            "Xóa ghi chú thất bại: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public static void saveNotesToFile(Context context) {
+        try {
+            String jsonData = exportDataAsJson();  // Lấy dữ liệu ghi chú dưới dạng JSON
+
+            // Lưu dữ liệu vào tệp cục bộ
+            FileOutputStream fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
+            fos.write(jsonData.getBytes());
+            fos.close();
+            Log.d(TAG, "File saved successfully");
+        } catch (IOException e) {
+            Log.e(TAG, "Error saving file: " + e.getMessage(), e);
+        }
+    }
+
 
 }
