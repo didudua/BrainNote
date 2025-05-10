@@ -123,48 +123,17 @@
                     android:layout_marginTop="8dp"
                     android:src="@drawable/ic_calendar" />
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/task_due_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Select Date"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:clickable="true"
+                    android:focusable="false"
                     android:layout_marginStart="16dp"
-                    android:orientation="vertical">
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/date_chip_group"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_today"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/today" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_tomorrow"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/tomorrow" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_custom"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/custom" />
-                    </com.google.android.material.chip.ChipGroup>
-
-                    <TextView
-                        android:id="@+id/selected_date_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        android:visibility="gone" />
-                </LinearLayout>
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
 
             <!-- Reminder Options -->
@@ -181,48 +150,18 @@
                     android:layout_marginTop="8dp"
                     android:src="@drawable/ic_alarm" />
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/task_alarm_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Select Time"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:clickable="true"
+                    android:focusable="false"
                     android:layout_marginStart="16dp"
-                    android:orientation="vertical">
+                    android:layout_marginTop="8dp" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/reminder_chip_group"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_one_hour"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/in_one_hour" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_four_hours"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/in_four_hours" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_custom_reminder"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/custom" />
-                    </com.google.android.material.chip.ChipGroup>
-
-                    <TextView
-                        android:id="@+id/selected_reminder_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        android:visibility="gone" />
-                </LinearLayout>
             </LinearLayout>
 
             <!-- Priority Options -->

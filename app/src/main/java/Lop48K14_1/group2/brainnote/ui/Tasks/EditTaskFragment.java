@@ -1,5 +1,11 @@
 package Lop48K14_1.group2.brainnote.ui.Tasks;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +33,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.models.Task;
 
@@ -37,8 +49,8 @@ public class EditTaskFragment extends Fragment {
     private String taskId;
     private Task currentTask;
 
-    private EditText taskTitleEditText, taskDescriptionEditText;
-    private ChipGroup dateChipGroup, priorityChipGroup, reminderChipGroup;
+    private EditText taskReminderEditText, taskDueDateEditText,taskTitleEditText, taskDescriptionEditText;
+    private ChipGroup priorityChipGroup, reminderChipGroup;
     private Button saveButton;
     private ImageButton closeButton;
     private ImageView flagButton;
@@ -82,9 +94,11 @@ public class EditTaskFragment extends Fragment {
 
         taskTitleEditText = view.findViewById(R.id.task_title_edit_text);
         taskDescriptionEditText = view.findViewById(R.id.task_description_edit_text);
-        dateChipGroup = view.findViewById(R.id.date_chip_group);
+        taskDueDateEditText = view.findViewById(R.id.task_due_date);
+        taskDueDateEditText.setOnClickListener(v -> showDateTimePickerDialog(taskDueDateEditText));
+        taskReminderEditText = view.findViewById(R.id.task_alarm_date);
+        taskReminderEditText.setOnClickListener(v -> showDateTimePickerDialog(taskReminderEditText));
         priorityChipGroup = view.findViewById(R.id.priority_chip_group);
-        reminderChipGroup = view.findViewById(R.id.reminder_chip_group);
         saveButton = view.findViewById(R.id.save_button);
         closeButton = view.findViewById(R.id.close_button);
         flagButton = view.findViewById(R.id.flag_button);
@@ -118,6 +132,28 @@ public class EditTaskFragment extends Fragment {
         return view;
     }
 
+    private void showDateTimePickerDialog(EditText dateEditText) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        // Hiển thị DatePickerDialog để chọn ngày
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // Sau khi người dùng chọn ngày, hiển thị TimePickerDialog để chọn giờ và phút
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                            (timeView, selectedHour, selectedMinute) -> {
+                                // Xử lý khi người dùng chọn giờ và phút
+                                String selectedDateTime =String.format("%02d", selectedHour) + ":" + String.format("%02d", selectedMinute) +" - " + selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear ;
+                                dateEditText.setText(selectedDateTime);  // Gán ngày và giờ vào EditText
+                            }, hour, minute, true);
+                    timePickerDialog.show();
+                }, year, month, day);
+        datePickerDialog.show();
+    }
     private void loadTaskData() {
         if (taskRef == null) return;
 
@@ -148,16 +184,8 @@ public class EditTaskFragment extends Fragment {
         taskRadioButton.setChecked(currentTask.isCompleted());
         updateFlagButtonState();
 
-        String dueDate = currentTask.getDueDate();
-        if (dueDate != null && !dueDate.isEmpty()) {
-            for (int i = 0; i < dateChipGroup.getChildCount(); i++) {
-                Chip chip = (Chip) dateChipGroup.getChildAt(i);
-                if (chip.getText().toString().equals(dueDate)) {
-                    chip.setChecked(true);
-                    break;
-                }
-            }
-        }
+        taskDueDateEditText.setText(currentTask.getDueDate());
+        taskReminderEditText.setText(currentTask.getReminder());
 
         int priority = currentTask.getPriority();
         int chipId;
@@ -210,13 +238,40 @@ public class EditTaskFragment extends Fragment {
         }
 
         String description = taskDescriptionEditText.getText().toString().trim();
-        String dueDate = "";
-        int dateChipId = dateChipGroup.getCheckedChipId();
-        if (dateChipId != -1) {
-            Chip selectedDateChip = dateChipGroup.findViewById(dateChipId);
-            if (selectedDateChip != null) {
-                dueDate = selectedDateChip.getText().toString();
+        String dueDate = taskDueDateEditText.getText().toString().trim();
+        String reminder = taskReminderEditText.getText().toString().trim();
+
+        if (dueDate.isEmpty() || reminder.isEmpty()) {
+            Toast.makeText(getContext(), "Please select a due date and reminder time", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Parse reminder time với định dạng đúng
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault());
+        Date date = null;
+        try {
+            date = format.parse(reminder);
+        } catch (ParseException e) {
+            Log.e("EditTaskFragment", "Failed to parse reminder: " + e.getMessage());
+            Toast.makeText(getContext(), "Invalid reminder format", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (date != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            // Kiểm tra thời gian trong tương lai
+            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                Toast.makeText(getContext(), "Reminder time must be in the future", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            setAlarm(calendar);
+        } else {
+            Log.e("EditTaskFragment", "Parsed date is null");
+            Toast.makeText(getContext(), "Error setting alarm", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         int priority = 0;
@@ -233,18 +288,10 @@ public class EditTaskFragment extends Fragment {
             }
         }
 
-        String reminder = "";
-        int reminderChipId = reminderChipGroup.getCheckedChipId();
-        if (reminderChipId != -1) {
-            Chip selectedReminderChip = reminderChipGroup.findViewById(reminderChipId);
-            if (selectedReminderChip != null) {
-                reminder = selectedReminderChip.getText().toString();
-            }
-        }
-
         currentTask.setTitle(title);
         currentTask.setDescription(description);
         currentTask.setDueDate(dueDate);
+        currentTask.setReminder(reminder);
         currentTask.setPriority(priority);
         currentTask.setCompleted(taskRadioButton.isChecked());
 
@@ -258,7 +305,21 @@ public class EditTaskFragment extends Fragment {
                     Toast.makeText(getContext(), R.string.task_updated_failure, Toast.LENGTH_SHORT).show();
                 });
     }
+    private void setAlarm(Calendar calendar) {
+        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 
+        // Tạo Intent và PendingIntent để gửi Broadcast khi đến giờ báo thức
+        Intent intent = new Intent(getContext(), AlarmReceiver.class);
+        intent.putExtra("task_title", taskTitleEditText.getText().toString());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Đặt báo thức
+        if (alarmManager != null) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        }
+
+    }
     private void navigateBack() {
         getParentFragmentManager().popBackStack();
     }

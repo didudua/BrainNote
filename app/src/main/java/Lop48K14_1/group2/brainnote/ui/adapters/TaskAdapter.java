@@ -150,7 +150,11 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private void bindTaskViewHolder(TaskViewHolder holder, Task task, boolean isCompleted) {
         holder.taskTitle.setText(task.getTitle());
-
+        if (task.getDueDate() != null && !task.getDueDate().isEmpty()) {
+            holder.taskDueDate.setText(task.getDueDate());  // Gán ngày hết hạn vào TextView
+        } else {
+            holder.taskDueDate.setText("No due date set");  // Nếu không có ngày hết hạn, hiển thị thông báo mặc định
+        }
         if (isCompleted) {
             holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
@@ -207,12 +211,14 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         RadioButton taskCheckbox;
         TextView taskTitle;
+        TextView taskDueDate;
         ConstraintLayout taskContainer;
 
         TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             taskCheckbox = itemView.findViewById(R.id.task_checkbox);
             taskTitle = itemView.findViewById(R.id.task_title);
+            taskDueDate = itemView.findViewById(R.id.task_due_date);
             taskContainer = itemView.findViewById(R.id.task_container);
         }
     }
