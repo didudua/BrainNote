@@ -53,7 +53,7 @@ public class TrashNoteAdapter extends RecyclerView.Adapter<TrashNoteAdapter.Note
         });
 
         holder.btnRestore.setOnClickListener(v -> {
-            // Xử lý khôi phục
+            listener.onRestore(note);
         });
 
     }

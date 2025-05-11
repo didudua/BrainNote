@@ -210,6 +210,7 @@ public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.O
                 .show();
     }
 
+    @Override
     public void onRestore(Note note) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
@@ -220,39 +221,44 @@ public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.O
                 JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray notebooksArray = jsonObject.getJSONArray("notebooks");
 
-                boolean notebookFound = false;
-
-                // Tìm đúng notebook để thêm ghi chú vào
+                // 1. Tìm notebook gốc
+                JSONObject targetNotebook = null;
                 for (int i = 0; i < notebooksArray.length(); i++) {
-                    JSONObject notebookObj = notebooksArray.getJSONObject(i);
-                    if (notebookObj.getString("id").equals(note.getNotebookId())) {
-                        JSONArray notesArray = notebookObj.getJSONArray("notes");
-
-                        // Tạo object note mới
-                        JSONObject newNote = new JSONObject();
-                        newNote.put("id", note.getId());
-                        newNote.put("title", note.getTitle());
-                        newNote.put("content", note.getContent());
-                        newNote.put("date", note.getDate());
-                        newNote.put("notebookId", note.getNotebookId());
-
-                        notesArray.put(newNote);
-                        notebookFound = true;
+                    JSONObject notebook = notebooksArray.getJSONObject(i);
+                    if (notebook.getString("id").equals(note.getNotebookId())) {
+                        targetNotebook = notebook;
                         break;
                     }
                 }
 
-                if (!notebookFound) {
-                    Toast.makeText(getContext(), "Không tìm thấy sổ tay tương ứng", Toast.LENGTH_SHORT).show();
+                if (targetNotebook == null) {
+                    Toast.makeText(getContext(), "Không tìm thấy sổ tay gốc để khôi phục", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Cập nhật lại dữ liệu vào backup_json
+                // 2. Thêm note vào notebook.notes
+                JSONArray notesArray = targetNotebook.optJSONArray("notes");
+                if (notesArray == null) {
+                    notesArray = new JSONArray();
+                }
+
+                JSONObject noteJson = new JSONObject();
+                noteJson.put("id", note.getId());
+                noteJson.put("title", note.getTitle());
+                noteJson.put("content", note.getContent());
+                noteJson.put("date", note.getDate());
+                noteJson.put("notebookId", note.getNotebookId());
+
+                notesArray.put(noteJson);
+                targetNotebook.put("notes", notesArray); // gán lại vào notebook
+
+                // 3. Ghi lại backup_json mới
                 userRef.child("backup_json").setValue(jsonObject.toString());
 
-                // Xóa ghi chú khỏi trash
+                // 4. Xóa khỏi trash
                 userRef.child("trash").child("notes").child(note.getId()).removeValue();
 
+                // 5. Thông báo
                 Toast.makeText(getContext(), "Ghi chú đã được khôi phục", Toast.LENGTH_SHORT).show();
 
             } catch (Exception e) {
