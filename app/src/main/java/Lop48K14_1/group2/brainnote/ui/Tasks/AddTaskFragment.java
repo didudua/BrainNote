@@ -1,5 +1,12 @@
 package Lop48K14_1.group2.brainnote.ui.Tasks;
 
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +30,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 import Lop48K14_1.group2.brainnote.R;
@@ -30,7 +42,7 @@ import Lop48K14_1.group2.brainnote.ui.models.Task;
 
 public class AddTaskFragment extends Fragment {
 
-    private EditText taskTitleEditText, taskDescriptionEditText;
+    private EditText taskTitleEditText, taskDescriptionEditText, taskReminderEditText, taskDueDateEditText;
     private ChipGroup dateChipGroup, priorityChipGroup, reminderChipGroup;
     private Button saveButton;
     private ImageButton closeButton;
@@ -40,6 +52,7 @@ public class AddTaskFragment extends Fragment {
     private DatabaseReference tasksRef;
     private FirebaseUser currentUser;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_task, container, false);
@@ -59,7 +72,10 @@ public class AddTaskFragment extends Fragment {
         // Initialize views
         taskTitleEditText = view.findViewById(R.id.task_title_edit_text);
         taskDescriptionEditText = view.findViewById(R.id.task_description_edit_text);
-        dateChipGroup = view.findViewById(R.id.date_chip_group);
+        taskDueDateEditText = view.findViewById(R.id.task_due_date);
+        taskDueDateEditText.setOnClickListener(v -> showDateTimePickerDialog(taskDueDateEditText));
+        taskReminderEditText = view.findViewById(R.id.task_alarm_date);
+        taskReminderEditText.setOnClickListener(v -> showDateTimePickerDialog(taskDueDateEditText));
         priorityChipGroup = view.findViewById(R.id.priority_chip_group);
         reminderChipGroup = view.findViewById(R.id.reminder_chip_group);
         saveButton = view.findViewById(R.id.save_button);
@@ -103,6 +119,29 @@ public class AddTaskFragment extends Fragment {
 
         return view;
     }
+    private void showDateTimePickerDialog(EditText dateEditText) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        // Hiển thị DatePickerDialog để chọn ngày
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // Sau khi người dùng chọn ngày, hiển thị TimePickerDialog để chọn giờ và phút
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                            (timeView, selectedHour, selectedMinute) -> {
+                                // Xử lý khi người dùng chọn giờ và phút
+                                String selectedDateTime =String.format("%02d", selectedHour) + ":" + String.format("%02d", selectedMinute) +" - " + selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear ;
+                                dateEditText.setText(selectedDateTime);  // Gán ngày và giờ vào EditText
+                            }, hour, minute, true);
+                    timePickerDialog.show();
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
 
     private void toggleFlag() {
         flagButton.setImageResource(flagButton.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_flag_outline).getConstantState()
@@ -123,7 +162,29 @@ public class AddTaskFragment extends Fragment {
         }
 
         String description = taskDescriptionEditText.getText().toString().trim();
-        String dueDate = "";
+        String dueDate = taskReminderEditText.getText().toString().trim(); // Nhận giá trị từ EditText chọn ngày giờ
+
+        if (dueDate.isEmpty()) {
+            Toast.makeText(getContext(), "Please select a due date and time", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Chuyển đổi ngày giờ từ EditText thành đối tượng Calendar
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        Date date = null;
+        try {
+            date = format.parse(dueDate); // Chuyển đổi giá trị vào Calendar
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (date != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            // Đặt báo thức
+            setAlarm(calendar);
+        }
         int dateChipId = dateChipGroup.getCheckedChipId();
         if (dateChipId != -1) {
             Chip selectedDateChip = dateChipGroup.findViewById(dateChipId);
@@ -178,6 +239,20 @@ public class AddTaskFragment extends Fragment {
                         Toast.makeText(getContext(), R.string.task_added_failure, Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+    private void setAlarm(Calendar calendar) {
+        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+
+        // Tạo Intent và PendingIntent để gửi Broadcast khi đến giờ báo thức
+        Intent intent = new Intent(getContext(), AlarmReceiver.class);
+        intent.putExtra("task_title", taskTitleEditText.getText().toString());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Đặt báo thức
+        if (alarmManager != null) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        }
     }
 
     private void navigateBack() {

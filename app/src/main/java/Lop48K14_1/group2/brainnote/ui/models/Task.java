@@ -7,6 +7,7 @@ public class Task {
     private String title;
     private String description;
     private String dueDate;
+    private String dueTime;
     private boolean isCompleted;
     private boolean isFlagged;
     private int priority; // 0: Low, 1: Medium, 2: High
@@ -54,9 +55,14 @@ public class Task {
     public String getDueDate() {
         return dueDate;
     }
-    
+    public String getReminder() {
+        return dueTime;
+    }
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
+    }
+    public void setReminder(String dueDate) {
+        this.dueTime = dueDate;
     }
     
     public boolean isCompleted() {

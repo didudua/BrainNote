@@ -66,6 +66,9 @@ public class HomeFragment extends Fragment {
         btnNewNotebook.setOnClickListener(v ->
                 nav.navigate(R.id.nav_newnotebook)
         );
+        btnNewTask.setOnClickListener(v ->
+                nav.navigate(R.id.addTaskFragment)
+        );
 
 
         // Thêm HeaderFragment nếu chưa được thêm
