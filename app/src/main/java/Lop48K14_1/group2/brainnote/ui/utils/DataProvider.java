@@ -1,12 +1,28 @@
 package Lop48K14_1.group2.brainnote.ui.utils;
 
+import static java.security.AccessController.getContext;
+
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
@@ -17,7 +33,7 @@ public class DataProvider {
 
     // Khởi tạo dữ liệu mẫu nếu cần
     public static void initializeSampleData() {
-
+        // Can be used to initialize sample data if needed.
     }
 
     public static List<Notebook> getNotebooks() {
@@ -54,6 +70,7 @@ public class DataProvider {
     public static void clearData() {
         notebooks.clear();
     }
+
     // Chuyển đổi dữ liệu sang JSON
     public static String getDataAsJson() {
         try {
@@ -101,28 +118,98 @@ public class DataProvider {
         return null;
     }
 
+    // Xóa ghi chú trong sổ tay
     public static void removeNoteFromNotebook(String notebookId, String noteId) {
+        // Tìm notebook theo notebookId
         Notebook nb = getNotebookById(notebookId);
-        if (nb == null) return;
+        if (nb == null) return;  // Nếu không tìm thấy notebook, không làm gì cả
 
-        // Dùng Iterator để tránh ConcurrentModificationException
+        // Sử dụng Iterator để tránh ConcurrentModificationException khi xóa
         Iterator<Note> iter = nb.getNotes().iterator();
         while (iter.hasNext()) {
-            if (iter.next().getId().equals(noteId)) {
-                iter.remove();
-                break;
+            Note note = iter.next();
+            if (note.getId().equals(noteId)) {
+                iter.remove();  // Xóa ghi chú khỏi danh sách
+                break;  // Đã xóa thành công thì thoát khỏi vòng lặp
             }
         }
+    }
+
+    // Cập nhật dữ liệu sau khi xóa
+    public static void removeNoteFromDataProvider(String notebookId, String noteId, Context context) {
+        removeNoteFromFirebase(notebookId, noteId, context);  // Xóa ghi chú từ Firebase
+        removeNoteFromNotebook(notebookId, noteId);  // Xóa ghi chú trong notebook
+
+        // Cập nhật lại dữ liệu JSON sau khi xóa
+        String updatedJson = getDataAsJson();
+
+        System.out.println("Updated Data: " + updatedJson);
+    }
+
+    private static void removeNoteFromFirebase(String notebookId, String noteId, Context context) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Lấy tham chiếu đến Firebase Realtime Database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference notesRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(user.getUid())  // Ensure you are referencing the correct user
+                .child("notebooks")
+                .child(notebookId)
+                .child("notes")
+                .child(noteId);
+
+        // Lấy dữ liệu trước khi xóa
+        notesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // In dữ liệu trước khi xóa
+                if (dataSnapshot.exists()) {
+                    Log.d("Firebase", "Dữ liệu trước khi xóa: " + dataSnapshot.getValue());
+                } else {
+                    Log.d("Firebase", "Ghi chú không tồn tại trước khi xóa.");
+                    Log.d("Firebase", "Notebook ID: " + notebookId);
+                    Log.d("Firebase", "Note ID: " + noteId);
+
+                }
+
+                // Xóa ghi chú từ Firebase
+                notesRef.removeValue()
+                        .addOnSuccessListener(aVoid -> {
+                            // Thành công, ghi chú đã được xóa
+                            Toast.makeText(context, "Ghi chú đã được xóa thành công từ Firebase", Toast.LENGTH_SHORT).show();
+
+                            // Kiểm tra lại dữ liệu sau khi xóa
+                            notesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // In dữ liệu sau khi xóa
+                                    if (dataSnapshot.exists()) {
+                                        Log.d("Firebase", "Dữ liệu sau khi xóa: " + dataSnapshot.getValue());
+                                    } else {
+                                        Log.d("Firebase", "Ghi chú đã bị xóa.");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.e("Firebase", "Lỗi khi đọc dữ liệu sau khi xóa: " + databaseError.getMessage());
+                                }
+                            });
+                        })
+                        .addOnFailureListener(e -> {
+                            // Xử lý lỗi nếu không xóa được ghi chú
+                            Toast.makeText(context, "Lỗi khi xóa ghi chú từ Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("Firebase", "Lỗi khi đọc dữ liệu trước khi xóa: " + databaseError.getMessage());
+            }
+        });
     }
 
     public static void removeNote(Note note) {
-        // Lọc qua tất cả các notebook để tìm và xóa note
-        for (Notebook notebook : notebooks) {
-            if (notebook.getNotes().contains(note)) {
-                notebook.getNotes().remove(note);
-                break; // Đã xóa thành công thì thoát khỏi vòng lặp
-            }
-        }
     }
-
 }

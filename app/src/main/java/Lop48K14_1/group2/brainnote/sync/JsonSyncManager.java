@@ -297,45 +297,6 @@ public class JsonSyncManager {
     private static void runOnUiThread(Context context, Runnable action) {
         new android.os.Handler(android.os.Looper.getMainLooper()).post(action);
     }
-    public static void deleteNoteFromFirebase(Context context, Note note) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(context, "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String uid = user.getUid();
-        String notebookId = note.getNotebookId();
-        String noteId = note.getId();
-
-        DatabaseReference noteRef = FirebaseDatabase.getInstance()
-                .getReference()
-                .child("users").child(uid)
-                .child("notebooks").child(notebookId)
-                .child("notes").child(noteId);
-
-        noteRef.removeValue()
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Note deleted successfully from Firebase.");
-
-                    // 1. Xóa khỏi DataProvider
-                    DataProvider.removeNote(note);
-
-                    // 2. Lưu cache local
-                    saveNotebooksToFile(context);
-
-
-                    // 4. Thông báo thành công
-                    Toast.makeText(context, "Ghi chú đã bị xóa thành công", Toast.LENGTH_SHORT).show();
-
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error deleting note from Firebase: ", e);
-                    Toast.makeText(context,
-                            "Xóa ghi chú thất bại: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                });
-    }
 
     public static void saveNotesToFile(Context context) {
         try {

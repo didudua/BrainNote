@@ -32,7 +32,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/formatting_toolbar"
         app:layout_constraintTop_toBottomOf="@id/headerContainer">
 
         <LinearLayout
@@ -60,31 +60,110 @@
 
             <!-- EditText for title (replacing TextView with EditText) -->
 
-                <EditText
-                    android:id="@+id/titleNote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:textSize="25sp"
-                    android:textStyle="bold"
-                    android:background="@null"
-                    android:hint="Tiêu đề" />
+            <EditText
+                android:id="@+id/titleNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:background="@null"
+                android:hint="Tiêu đề" />
 
             <!-- EditText for content (replacing TextView with EditText) -->
 
-                <EditText
-                    android:id="@+id/contentNote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginLeft="10dp"
-                    android:lineSpacingExtra="4dp"
-                    android:textSize="16sp"
-                    android:hint="Bắt đầu viết"
-                    android:background="@null"
-                    />
+            <EditText
+                android:id="@+id/contentNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="10dp"
+                android:lineSpacingExtra="4dp"
+                android:textSize="16sp"
+                android:hint="Bắt đầu viết"
+                android:background="@null"
+                />
 
         </LinearLayout>
     </ScrollView>
+
+    <!-- Formatting Toolbar -->
+    <HorizontalScrollView
+        android:id="@+id/formatting_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F5F5F5"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerContainer">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <!-- Add Button -->
+            <ImageButton
+                android:id="@+id/btn_add"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/circle_button_background"
+                android:contentDescription="Add"
+                android:padding="5dp"
+                android:src="@drawable/ic_add" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="#E0E0E0" />
+
+
+            <!-- Bold Button -->
+            <ImageButton
+                android:id="@+id/btn_bold"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Bold"
+                android:padding="8dp"
+                android:src="@drawable/ic_bold" />
+
+            <!-- Italic Button -->
+            <ImageButton
+                android:id="@+id/btn_italic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Italic"
+                android:padding="8dp"
+                android:src="@drawable/ic_italic" />
+
+            <!-- Underline Button -->
+            <ImageButton
+                android:id="@+id/btn_underline"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Underline"
+                android:padding="8dp"
+                android:src="@drawable/ic_underline" />
+
+            <!-- List Button -->
+            <ImageButton
+                android:id="@+id/btn_list"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="List"
+                android:padding="8dp"
+                android:src="@drawable/ic_list" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
