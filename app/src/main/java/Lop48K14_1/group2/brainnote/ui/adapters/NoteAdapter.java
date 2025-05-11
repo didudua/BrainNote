@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -205,7 +206,7 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     // Original ViewHolder for large view - using your existing IDs
     public class LargeViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, contentTextView, dateTextView;
-        Button deleteNoteButton;
+        View deleteNoteButton, itemLarge;
 
         public LargeViewHolder(@NonNull View v) {
             super(v);
@@ -213,8 +214,9 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             contentTextView = v.findViewById(R.id.tvNoteContent);
             dateTextView = v.findViewById(R.id.tvNoteTime);
             deleteNoteButton = v.findViewById(R.id.btn_delete_note);
+            itemLarge = v.findViewById(R.id.itemLarge);
 
-            v.setOnClickListener(view -> {
+            itemLarge.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION && listener != null) {
                     listener.onNoteClick(notes.get(pos));
@@ -233,15 +235,16 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     // New ViewHolder for title-only view
     public class TitleViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, dateTextView;
-        View deleteButton;
+        View deleteButton, itemTitle;
 
         public TitleViewHolder(@NonNull View v) {
             super(v);
             titleTextView = v.findViewById(R.id.tvNoteTitle);
             dateTextView = v.findViewById(R.id.tvNoteTime);
             deleteButton = v.findViewById(R.id.btn_delete_note);
+            itemTitle = v.findViewById(R.id.itemTitle);
 
-            v.setOnClickListener(view -> {
+            itemTitle.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION && listener != null) {
                     listener.onNoteClick(notes.get(pos));
@@ -262,19 +265,31 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     // New ViewHolder for small view
     public class SmallViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView, contentPreviewTextView, dateTextView;
+        View deleteButton, itemSmall;
 
         public SmallViewHolder(@NonNull View v) {
             super(v);
             titleTextView = v.findViewById(R.id.tvNoteTitle);
             contentPreviewTextView = v.findViewById(R.id.tvNoteContent);
             dateTextView = v.findViewById(R.id.tvNoteTime);
+            deleteButton = v.findViewById(R.id.btn_delete_note);
+            itemSmall = v.findViewById(R.id.itemSmall);
 
-            v.setOnClickListener(view -> {
+            itemSmall.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onNoteClick(notes.get(pos));
+                    listener.onNoteClick(notes.get(pos)); // Gọi hàm xử lý khi nhấn vào item
                 }
             });
+
+            if (deleteButton != null) {
+                deleteButton.setOnClickListener(view -> {
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION && deleteListener != null) {
+                        deleteListener.onNoteDelete(notes.get(pos), pos);
+                    }
+                });
+            }
 
         }
     }
@@ -292,9 +307,7 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
             v.setOnClickListener(view -> {
                 int pos = getAdapterPosition();
-                if (pos != RecyclerView.NO_POSITION && listener != null) {
                     listener.onNoteClick(notes.get(pos));
-                }
             });
 
             if (deleteButton != null) {
