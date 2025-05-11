@@ -28,6 +28,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.FirebaseDatabase;
 
 import Lop48K14_1.group2.brainnote.MainActivity;
 import Lop48K14_1.group2.brainnote.R;
@@ -157,6 +158,22 @@ public class LoginFragment extends Fragment {
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+
+                        String uid = user.getUid();
+
+                        // Kiểm tra trên Realtime Database xem user đã tồn tại chưa
+                        FirebaseDatabase.getInstance().getReference("users").child(uid)
+                                .get()
+                                .addOnSuccessListener(snapshot -> {
+                                    if (!snapshot.exists()) {
+                                        // Người dùng mới => gọi upload createdAt
+                                        JsonSyncManager.uploadaccountcreatedAtToFirebase();
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("FIREBASE", "Lỗi kiểm tra người dùng: " + e.getMessage());
+                                });
+
                         saveEmail(user.getEmail());
                         Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
 

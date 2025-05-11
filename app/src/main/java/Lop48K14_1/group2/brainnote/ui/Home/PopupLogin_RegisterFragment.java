@@ -112,6 +112,7 @@ public class PopupLogin_RegisterFragment extends BottomSheetDialogFragment {
                             // Làm mới dữ liệu sau khi đăng ký tài khoản mới
                             DataProvider.clearData();
                             JsonSyncManager.uploadNotebooksToFirebase();
+                            JsonSyncManager.uploadaccountcreatedAtToFirebase();
                             Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
 
                             Bundle bundle = new Bundle();

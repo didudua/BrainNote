@@ -2,13 +2,33 @@ package Lop48K14_1.group2.brainnote.ui.Home;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
+import Lop48K14_1.group2.brainnote.ui.adapters.NotificationAdapter;
+import Lop48K14_1.group2.brainnote.ui.models.Notification;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,17 +70,72 @@ public class NotificationFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        super.onCreate(savedInstanceState); // layout tạm nếu cần
+
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notification, container, false);
+        // Inflate layout
+        View rootView = inflater.inflate(R.layout.fragment_notification, container, false);
+
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerViewTrashNotes);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        List<Notification> notificationList = new ArrayList<>();
+        NotificationAdapter adapter = new NotificationAdapter(notificationList);
+        recyclerView.setAdapter(adapter);
+
+        // Lấy user ID
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Firebase references
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+        DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("notifications");
+
+        // Back button
+        ImageView btnBack = rootView.findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_notificationFragment_to_homeFragment);
+        });
+
+        // Lấy thông tin createdAt từ user
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Long createdAt = snapshot.hasChild("createdAt") ? snapshot.child("createdAt").getValue(Long.class) : null;
+
+                // Load tất cả thông báo
+                notificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot notiSnapshot) {
+                        notificationList.clear();
+                        for (DataSnapshot child : notiSnapshot.getChildren()) {
+                            Notification noti = child.getValue(Notification.class);
+                            if (noti == null) continue;
+
+                            long notiTime = noti.getTimestamp();
+                            if (createdAt == null || createdAt < notiTime) {
+                                notificationList.add(noti);
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("NotificationFragment", "Failed to read notifications", error.toException());
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("NotificationFragment", "Failed to read user data", error.toException());
+            }
+        });
+
+        return rootView;
     }
 }

@@ -35,7 +35,7 @@ import Lop48K14_1.group2.brainnote.ui.adapters.TrashNotebookAdapter;
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 
-public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.OnTrashItemClickListener {
+public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.OnTrashItemClickListener, TrashNoteAdapter.OnTrashNoteClickListener {
 
     private RecyclerView recyclerView, noterecyclerView;
     private TrashNotebookAdapter adapter;
@@ -79,6 +79,8 @@ public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.O
         // Load deleted notebooks from Firebase
         loadDeletedNotebooks();
 
+        loadDeletedNotes();
+
         return rootView;
     }
 
@@ -100,6 +102,43 @@ public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.O
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Handle database error
+            }
+        });
+    }
+
+    private void loadDeletedNotes() {
+        // Lấy ID người dùng hiện tại từ Firebase Auth
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Tham chiếu tới Firebase nơi chứa các ghi chú đã xóa
+        trashNotesRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("trash").child("notes");
+
+        // Thêm ValueEventListener để theo dõi sự thay đổi của dữ liệu
+        trashNotesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Xóa danh sách cũ trước khi thêm dữ liệu mới
+                deletedNotes.clear();
+
+                // Duyệt qua các ghi chú trong Firebase
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    // Chuyển dữ liệu từ Firebase thành đối tượng Note
+                    Note note = snapshot.getValue(Note.class);
+
+                    // Kiểm tra nếu ghi chú hợp lệ và thêm vào danh sách deletedNotes
+                    if (note != null) {
+                        deletedNotes.add(note);
+                    }
+                }
+
+                // Cập nhật RecyclerView sau khi dữ liệu đã được tải xong
+                noteadapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Xử lý lỗi khi lấy dữ liệu
+                Toast.makeText(getContext(), "Lỗi khi tải ghi chú", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -166,6 +205,75 @@ public class TrashCanFragment extends Fragment implements TrashNotebookAdapter.O
                     userRef.child("trash").child("notebooks").child(notebook.getId()).removeValue();
 
                     Toast.makeText(getContext(), "Sổ tay đã bị xóa vĩnh viễn", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    public void onRestore(Note note) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        userRef.child("backup_json").get().addOnSuccessListener(snapshot -> {
+            try {
+                String jsonString = snapshot.getValue(String.class);
+                JSONObject jsonObject = new JSONObject(jsonString);
+                JSONArray notebooksArray = jsonObject.getJSONArray("notebooks");
+
+                boolean notebookFound = false;
+
+                // Tìm đúng notebook để thêm ghi chú vào
+                for (int i = 0; i < notebooksArray.length(); i++) {
+                    JSONObject notebookObj = notebooksArray.getJSONObject(i);
+                    if (notebookObj.getString("id").equals(note.getNotebookId())) {
+                        JSONArray notesArray = notebookObj.getJSONArray("notes");
+
+                        // Tạo object note mới
+                        JSONObject newNote = new JSONObject();
+                        newNote.put("id", note.getId());
+                        newNote.put("title", note.getTitle());
+                        newNote.put("content", note.getContent());
+                        newNote.put("date", note.getDate());
+                        newNote.put("notebookId", note.getNotebookId());
+
+                        notesArray.put(newNote);
+                        notebookFound = true;
+                        break;
+                    }
+                }
+
+                if (!notebookFound) {
+                    Toast.makeText(getContext(), "Không tìm thấy sổ tay tương ứng", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Cập nhật lại dữ liệu vào backup_json
+                userRef.child("backup_json").setValue(jsonObject.toString());
+
+                // Xóa ghi chú khỏi trash
+                userRef.child("trash").child("notes").child(note.getId()).removeValue();
+
+                Toast.makeText(getContext(), "Ghi chú đã được khôi phục", Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Lỗi khi khôi phục ghi chú", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onDeletePermanently(Note note) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận xóa vĩnh viễn")
+                .setMessage("Bạn có chắc muốn xóa vĩnh viễn ghi chú \"" + note.getTitle() + "\"? Hành động này không thể hoàn tác.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+                    userRef.child("trash").child("notes").child(note.getId()).removeValue();
+
+                    Toast.makeText(getContext(), "Ghi chú đã bị xóa vĩnh viễn", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Hủy", null)
                 .show();

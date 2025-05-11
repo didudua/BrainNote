@@ -112,7 +112,11 @@
         android:id="@+id/nav_notification"
         android:name="Lop48K14_1.group2.brainnote.ui.Home.NotificationFragment"
         android:label="fragment_notification"
-        tools:layout="@layout/fragment_notification" />
+        tools:layout="@layout/fragment_notification">
+        <action
+            android:id="@+id/action_notificationFragment_to_homeFragment"
+            app:destination="@id/nav_create" />
+    </fragment>
     <fragment
         android:id="@+id/nav_trashcan"
         android:name="Lop48K14_1.group2.brainnote.ui.Home.TrashCanFragment"

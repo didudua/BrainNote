@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
@@ -20,10 +21,12 @@ public class TrashNoteAdapter extends RecyclerView.Adapter<TrashNoteAdapter.Note
 
     private List<Note> notes;
     private Context context;
+    private OnTrashNoteClickListener listener;
 
-    public TrashNoteAdapter(Context context, List<Note> notes, TrashNotebookAdapter.OnTrashItemClickListener listener) {
+    public TrashNoteAdapter(Context context, List<Note> notes, TrashNoteAdapter.OnTrashNoteClickListener listener) {
         this.context = context;
         this.notes = notes;
+        this.listener = listener;
     }
 
     public interface OnTrashNoteClickListener {
@@ -46,12 +49,13 @@ public class TrashNoteAdapter extends RecyclerView.Adapter<TrashNoteAdapter.Note
 
         // Gắn listener nếu cần
         holder.btnDelete.setOnClickListener(v -> {
-            // Xử lý xóa vĩnh viễn
+            listener.onDeletePermanently(note);
         });
 
         holder.btnRestore.setOnClickListener(v -> {
             // Xử lý khôi phục
         });
+
     }
 
     @Override

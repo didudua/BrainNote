@@ -5,14 +5,14 @@ public class Note {
     private String title;
     private String content;
     private String date;
-    private String noteBookId;
+    private String notebookId;
 
     public Note(String id, String noteBookId, String title, String content, String date) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.date = date;
-        this.noteBookId = noteBookId;
+        this.notebookId = noteBookId;
     }
 
     public Note() {
@@ -52,10 +52,10 @@ public class Note {
     }
 
     public String getNotebookId() {
-        return noteBookId;
+        return notebookId;
     }
 
     public void setNotebookId(String notebookId) {
-        this.noteBookId = notebookId;
+        this.notebookId = notebookId;
     }
 }

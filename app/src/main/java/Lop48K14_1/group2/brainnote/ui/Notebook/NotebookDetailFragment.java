@@ -31,7 +31,7 @@ import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
-public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNoteClickListener {
+public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNoteClickListener, NoteAdapter.OnNoteDeleteListener {
 
     private RecyclerView recyclerView;
     private NoteAdapter adapter;
@@ -187,5 +187,13 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
                 updateNoteCount();
             }
         }
+    }
+    @Override
+    public void onNoteDelete(Note note, int position) {
+        // Xử lý xóa ghi chú tại vị trí 'position' trong danh sách 'notes'
+        notes.remove(position);
+        filteredNotes.remove(position); // Cập nhật cả filteredNotes để lọc chính xác
+        adapter.notifyItemRemoved(position); // Thông báo adapter đã xóa item
+        updateNoteCount(); // Cập nhật lại số lượng ghi chú
     }
 }

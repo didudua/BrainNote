@@ -26,6 +26,7 @@ import java.util.List;
 
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
+import Lop48K14_1.group2.brainnote.ui.models.Notification;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
 public class JsonSyncManager {
@@ -78,6 +79,7 @@ public class JsonSyncManager {
         String userId = user.getUid();
         String email = user.getEmail();  // <-- lấy email người dùng
         String username;
+
         username = user.getDisplayName();
         if(username == null ||username.isEmpty()){
             if (email != null && email.contains("@")) {
@@ -297,6 +299,49 @@ public class JsonSyncManager {
         } catch (IOException e) {
             Log.e(TAG, "Error saving file: " + e.getMessage(), e);
         }
+    }
+
+
+    public static void addNotification(String title, String content) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference notificationsRef = database.getReference("notifications");
+
+        String notificationId = notificationsRef.push().getKey();
+
+        if (notificationId == null) {
+            Log.e("NotificationManager", "Không thể tạo ID thông báo");
+            return;
+        }
+
+        Notification notification = new Notification(title, content, System.currentTimeMillis());
+
+        notificationsRef.child(notificationId).setValue(notification)
+                .addOnSuccessListener(aVoid ->
+                        Log.d("NotificationManager", "Thông báo đã được thêm"))
+                .addOnFailureListener(e ->
+                        Log.e("NotificationManager", "Lỗi khi thêm thông báo: " + e.getMessage()));
+    }
+
+    public static void uploadaccountcreatedAtToFirebase() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Log.e(TAG, "Cannot upload to Firebase: User not logged in");
+            return;
+        }
+
+        String userId = user.getUid();
+
+        String jsonData = exportDataAsJson();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference userRef = database.getReference("users").child(userId);
+
+        // Upload cả email và backup_json vào cùng cấp
+        long createdAt = System.currentTimeMillis();
+        userRef.child("createdAt").setValue(createdAt);
+        userRef.child("backup_json").setValue(jsonData)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Upload to Firebase successful for user: " + userId))
+                .addOnFailureListener(e -> Log.e(TAG, "Upload to Firebase failed for user: " + userId + ": " + e.getMessage(), e));
     }
 
 
