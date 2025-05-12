@@ -64,6 +64,11 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:24.10.0")
     implementation("com.google.firebase:firebase-database:20.2.0")
 
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
     // Third-party libraries
-//    implementation("com.github.chthai64:SwipeRevealLayout:1.4.0")
+    implementation("com.github.chthai64:SwipeRevealLayout:1.4.0"){
+        exclude(group = "com.android.support", module = "support-v4")
+    }
 }
