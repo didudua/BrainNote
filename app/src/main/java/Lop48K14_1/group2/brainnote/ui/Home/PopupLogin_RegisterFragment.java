@@ -37,7 +37,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import Lop48K14_1.group2.brainnote.MainActivity;
+
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 import Lop48K14_1.group2.brainnote.ui.Login.LoginFragment;

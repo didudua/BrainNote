@@ -14,28 +14,21 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.Collections;
-import java.util.Comparator;
-
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.adapters.TaskAdapter;
-import Lop48K14_1.group2.brainnote.ui.models.Task;
 
 public class TaskOptionsFragment extends DialogFragment {
 
     private TaskAdapter taskAdapter;
-    private java.util.List<Task> incompleteTasks;
-    private java.util.List<Task> completedTasks;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NO_FRAME, R.style.Theme_BrainNote);
+        // Initialize taskAdapter only if parent fragment is TasksFragment
         if (getParentFragment() instanceof TasksFragment) {
             TasksFragment tasksFragment = (TasksFragment) getParentFragment();
             taskAdapter = tasksFragment.getTaskAdapter();
-            incompleteTasks = tasksFragment.getIncompleteTasks();
-            completedTasks = tasksFragment.getCompletedTasks();
         }
     }
 
@@ -64,27 +57,17 @@ public class TaskOptionsFragment extends DialogFragment {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Sort By")
                 .setItems(sortOptions, (dialog, which) -> {
-                    if (which == 0) {
-                        sortByCreationDate();
+                    String selectedOption = sortOptions[which];
+                    // Check if parent fragment is still available
+                    if (getParentFragment() instanceof TasksFragment) {
+                        TasksFragment tasksFragment = (TasksFragment) getParentFragment();
+                        tasksFragment.setSortOption(selectedOption);
                     } else {
-                        sortByPriority();
+                        Toast.makeText(getContext(), "Cannot apply sort: Parent fragment not found", Toast.LENGTH_SHORT).show();
                     }
-                    taskAdapter.notifyDataSetChanged();
                     dialog.dismiss();
                     dismiss();
                 })
                 .show();
-    }
-
-    private void sortByCreationDate() {
-        Comparator<Task> dateComparator = (task1, task2) -> task1.getId().compareTo(task2.getId());
-        Collections.sort(incompleteTasks, dateComparator);
-        Collections.sort(completedTasks, dateComparator);
-    }
-
-    private void sortByPriority() {
-        Comparator<Task> priorityComparator = (task1, task2) -> Integer.compare(task2.getPriority(), task1.getPriority());
-        Collections.sort(incompleteTasks, priorityComparator);
-        Collections.sort(completedTasks, priorityComparator);
     }
 }

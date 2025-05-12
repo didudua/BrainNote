@@ -56,12 +56,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <RadioButton
-                android:id="@+id/task_radio_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:buttonTint="@color/purple_500"
-                android:enabled="true" />
 
             <EditText
                 android:id="@+id/task_title_edit_text"

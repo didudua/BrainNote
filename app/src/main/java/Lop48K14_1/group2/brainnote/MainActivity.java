@@ -21,6 +21,7 @@ import Lop48K14_1.group2.brainnote.ui.Login.WelcomeFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
+
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 

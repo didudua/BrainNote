@@ -87,7 +87,7 @@ public class NewNoteFragment extends Fragment {
         String content = contentEditText.getText().toString().trim();
 
         if (title.isEmpty()) {
-            title = "Tài liệu không có tiêu đề +wqhjd";
+            title = "Tài liệu không có tiêu đề";
         }
         if (content.isEmpty()) {
             content = "";
