@@ -360,6 +360,4 @@ public class JsonSyncManager {
                 .addOnFailureListener(e -> Log.e(TAG, "Upload to Firebase failed for user: " + userId + ": " + e.getMessage(), e));
     }
 
-
-
 }

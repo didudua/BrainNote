@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ public class NewNoteFragment extends Fragment {
     private TextView noteBookDefault;
     private ImageButton backButton;
     private String notebookId;
-    private Notebook notebook;
+    private Notebook notebook, notebookDefaults;
     private List<Notebook> notebooks;
 
 
@@ -48,13 +49,14 @@ public class NewNoteFragment extends Fragment {
 
         // 1. Lấy danh sách sổ
         notebooks = DataProvider.getNotebooks();
-
-        // 2. Khởi tạo giá trị mặc định
-        if (getArguments() != null && getArguments().containsKey("NOTEBOOK_ID")) {
-            notebookId = getArguments().getString("NOTEBOOK_ID");
-        } else {
-            notebookId = notebooks.get(0).getId();
+        for (Notebook notebook : notebooks) {
+            if (notebook.getDefault()) {
+                notebookDefaults = notebook;
+                break;
+            }
         }
+
+        notebookId = notebookDefaults.getId();
         // Hiển thị tên sổ hiện tại
         notebook = DataProvider.getNotebookById(notebookId);
         noteBookDefault.setText(notebook.getName());
