@@ -1,5 +1,6 @@
 package Lop48K14_1.group2.brainnote.ui.Notebook;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
@@ -47,6 +48,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
     private Notebook notebook;
     private String notebookId;
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,7 +74,7 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         titleTextView = view.findViewById(R.id.titleTextView);
         noteCountTextView = view.findViewById(R.id.noteCountTextView);
         backButton = view.findViewById(R.id.backButton);
-        addButton = view.findViewById(R.id.addButton);
+        addButton = view.findViewById(R.id.addButtonInNotebook);
         searchEditText = view.findViewById(R.id.searchEditText);
 
         // Thiết lập tiêu đề

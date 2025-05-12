@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import Lop48K14_1.group2.brainnote.ui.models.Note;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
@@ -45,6 +46,7 @@ public class JsonSyncManager {
                 JSONObject notebookObj = new JSONObject();
                 notebookObj.put("id", notebook.getId());
                 notebookObj.put("name", notebook.getName());
+                notebookObj.put("Default", notebook.getDefault());
 
                 JSONArray notesArray = new JSONArray();
                 for (Note note : notebook.getNotes()) {
@@ -204,6 +206,7 @@ public class JsonSyncManager {
 
                 String id = notebookObj.getString("id");
                 String name = notebookObj.getString("name");
+                boolean Default = notebookObj.getBoolean("Default");
 
                 List<Note> notes = new ArrayList<>();
                 JSONArray notesArray = notebookObj.getJSONArray("notes");
@@ -219,7 +222,7 @@ public class JsonSyncManager {
                     notes.add(new Note(noteId,id , title, content, date));
                 }
 
-                Notebook notebook = new Notebook(id, name, notes);
+                Notebook notebook = new Notebook(id, name, notes,Default);
                 notebookList.add(notebook);
             }
 
@@ -356,6 +359,7 @@ public class JsonSyncManager {
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Upload to Firebase successful for user: " + userId))
                 .addOnFailureListener(e -> Log.e(TAG, "Upload to Firebase failed for user: " + userId + ": " + e.getMessage(), e));
     }
+
 
 
 }
