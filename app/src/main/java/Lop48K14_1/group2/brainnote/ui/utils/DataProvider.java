@@ -2,6 +2,9 @@ package Lop48K14_1.group2.brainnote.ui.utils;
 
 import static java.security.AccessController.getContext;
 
+import static Lop48K14_1.group2.brainnote.sync.JsonSyncManager.saveNotebooksToFile;
+import static Lop48K14_1.group2.brainnote.sync.JsonSyncManager.uploadNotebooksToFirebase;
+
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -294,5 +297,38 @@ public class DataProvider {
                     Log.e("DataProvider", "Failed to update notebook in Firebase: " + e.getMessage());
                 });
     }
+    public static void updateNotebook(Notebook updatedNotebook, Context context) {
+        // Step 1: Update the local list of notebooks
+        for (int i = 0; i < notebooks.size(); i++) {
+            if (notebooks.get(i).getId().equals(updatedNotebook.getId())) {
+                // Replace the old notebook with the updated one
+                notebooks.set(i, updatedNotebook);
+                Log.d("DataProvider", "Updated local notebook with ID: " + updatedNotebook.getId());
+                break;
+            }
+        }
+
+        // Step 2: Update the notebook data in Firebase
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("backup_json");
+
+        // Find the specific notebook and update its values in Firebase
+        userRef.child("notebooks").child(updatedNotebook.getId()).setValue(updatedNotebook)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("DataProvider", "Successfully updated notebook in Firebase.");
+
+                    // Step 3: Save updated notebooks to a file
+                    saveNotebooksToFile(context);  // Save the updated data locally
+
+                    // Step 4: Upload the backup data to Firebase after local update
+                    uploadNotebooksToFirebase();  // Upload the full updated notebook data to Firebase
+
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DataProvider", "Failed to update notebook in Firebase: " + e.getMessage());
+                    Toast.makeText(context, "Failed to update notebook. Please try again.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
 }

@@ -363,6 +363,12 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
     public void onResume() {
         super.onResume();
         notebooks = DataProvider.getNotebooks();
+        // Sort notebooks by 'Default' - true should come first
+        notebooks.sort((o1, o2) -> Boolean.compare(o2.getDefault(), o1.getDefault()));
+
+
+        // Apply search filter on the sorted notebooks
+        filterNotebooks(searchEditText.getText().toString());
         filterNotebooks(searchEditText.getText().toString());
     }
 }

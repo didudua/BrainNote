@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
+import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
@@ -91,11 +92,10 @@ public class MoreOptionsBottomSheetNoteBook extends BottomSheetDialogFragment {
                         tittleMainNote.setText(selectedNotebook.getName());
 
 //                        // Update the local notebook data
-//                        notebookDefault.setDefault(false);
-//                        selectedNotebook.setDefault(true);
-//                        DataProvider.updateNotebook(notebookDefault);
-//                        DataProvider.updateNotebook(selectedNotebook);
-
+                        notebookDefault.setDefault(false);
+                        selectedNotebook.setDefault(true);
+                        DataProvider.updateNotebook(selectedNotebook,getContext());
+                        DataProvider.updateNotebook(notebookDefault,getContext());
                     })
                     .show();
         });
