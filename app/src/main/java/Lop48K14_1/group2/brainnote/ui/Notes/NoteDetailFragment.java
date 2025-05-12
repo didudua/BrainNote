@@ -2,8 +2,12 @@ package Lop48K14_1.group2.brainnote.ui.Notes;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +34,7 @@ import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 public class NoteDetailFragment extends Fragment {
     private EditText titleEditText, contentEditText;
     private TextView noteBookDefault;
-    private ImageButton backButton;
+    private ImageButton backButton, btnBold, btnItalic, btnUnderline;
     private String notebookId, noteId, originalNotebookId;
     private Notebook notebook;
     private Note note;
@@ -50,6 +54,10 @@ public class NoteDetailFragment extends Fragment {
         contentEditText = view.findViewById(R.id.contentNote);
         backButton      = view.findViewById(R.id.backButtonNote);
         noteBookDefault = view.findViewById(R.id.default_notebook_note);
+
+        btnBold         = view.findViewById(R.id.btn_bold);
+        btnItalic       = view.findViewById(R.id.btn_italic);
+        btnUnderline    = view.findViewById(R.id.btn_underline);
 
         // Load notebooks
         notebooks = DataProvider.getNotebooks();
@@ -99,6 +107,8 @@ public class NoteDetailFragment extends Fragment {
 
         // Save or create
         backButton.setOnClickListener(v -> saveNote());
+
+        btnBold.setOnClickListener(v -> toggleBold());
         return view;
     }
 
@@ -133,4 +143,27 @@ public class NoteDetailFragment extends Fragment {
 
         requireActivity().getSupportFragmentManager().popBackStack();
     }
+    private void toggleBold() {
+        int selectionStart = contentEditText.getSelectionStart();
+        int selectionEnd = contentEditText.getSelectionEnd();
+
+        if (selectionStart != selectionEnd) {
+            Spannable spannable = (Spannable) contentEditText.getText();
+            StyleSpan[] spans = spannable.getSpans(selectionStart, selectionEnd, StyleSpan.class);
+            boolean isBold = false;
+            for (StyleSpan span : spans) {
+                if (span.getStyle() == Typeface.BOLD) {
+                    isBold = true;
+                    break;
+                }
+            }
+
+            if (isBold) {
+                spannable.removeSpan(new StyleSpan(Typeface.BOLD)); // Remove Bold
+            } else {
+                spannable.setSpan(new StyleSpan(Typeface.BOLD), selectionStart, selectionEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE); // Apply Bold
+            }
+        }
+    }
+
 }
