@@ -6,15 +6,24 @@ import java.util.List;
 public class Notebook {
     private String id;
     private String name;
+    private boolean Default;
     private List<Note> notes;
     public Notebook() {
         // cần thiết cho Firebase
     }
 
-    public Notebook(String id, String name, List<Note> notes) {
+    public Notebook(String id, String name, List<Note> notes, boolean Default) {
         this.id = id;
         this.name = name;
         this.notes = notes != null ? notes : new ArrayList<>();
+        this.Default = Default;
+    }
+    public boolean getDefault() {
+        return Default;
+    }
+
+    public void setDefault(boolean Default) {
+        this.Default = Default;
     }
 
     public String getId() {

@@ -12,7 +12,7 @@
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:src="@drawable/ic_delete"
-        android:background="@color/red" />
+        android:background="@color/googleRed" />
 
     <LinearLayout
         android:layout_width="wrap_content"

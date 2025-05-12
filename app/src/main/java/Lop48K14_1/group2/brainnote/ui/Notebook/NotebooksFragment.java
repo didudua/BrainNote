@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -51,6 +52,7 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
     private EditText searchEditText;
     private TextView notebookCountTextView;
     private FloatingActionButton addButton;
+    private View btnMoreNotebook;
     private int swipedPosition = -1;
 
     @Nullable
@@ -63,6 +65,10 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
         searchEditText = view.findViewById(R.id.searchEditText);
         notebookCountTextView = view.findViewById(R.id.notebookCountTextView);
         addButton = view.findViewById(R.id.addButton);
+        btnMoreNotebook = view.findViewById(R.id.btn_more_notebook);
+        btnMoreNotebook.setOnClickListener(v -> {
+            showViewModeOptions();
+        });
 
         // Thiết lập RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -137,6 +143,11 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
         });
 
         return view;
+    }
+
+    private void showViewModeOptions() {
+        MoreOptionsBottomSheetNoteBook bottomSheetFragment = new MoreOptionsBottomSheetNoteBook();
+        bottomSheetFragment.show(getChildFragmentManager(), bottomSheetFragment.getTag());
     }
 
     private void setupItemTouchHelper() {
@@ -325,6 +336,11 @@ public class NotebooksFragment extends Fragment implements NotebookAdapter.OnNot
                 .setTitle("Xác nhận xóa")
                 .setMessage("Bạn có chắc muốn xóa sổ tay \"" + notebook.getName() + "\"? Hành động này không thể hoàn tác.")
                 .setPositiveButton("Xóa", (dialog, which) -> {
+                    Log.e("NotebookDetailFragment", "Notebook not found in onResume for ID: " + notebook.getDefault());
+                    if (notebook.getDefault()) {
+                        Toast.makeText(getContext(), "Không thể xóa sổ tay mặc định", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     // Di chuyển vào Trash thay vì xóa hoàn toàn
                     JsonSyncManager.moveNotebookToTrash(requireContext(), notebook);
 
