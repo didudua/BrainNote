@@ -36,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             if (currentUser != null) {
-                // Làm mới DataProvider trước khi đồng bộ
-                DataProvider.clearData();
                 syncNotebooksToFirebase(currentUser);
             } else {
                 // Chưa đăng nhập → load WelcomeFragment

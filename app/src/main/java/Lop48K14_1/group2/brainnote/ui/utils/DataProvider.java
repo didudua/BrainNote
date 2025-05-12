@@ -56,7 +56,44 @@ public class DataProvider {
     public static void addNoteToNotebook(String notebookId, Note note) {
         Notebook notebook = getNotebookById(notebookId);
         if (notebook != null) {
-            notebook.addNote(note);
+            List<Note> notes = notebook.getNotes();
+
+            // Kiểm tra nếu ghi chú đã tồn tại trong danh sách
+            boolean isExist = false;
+            for (int i = 0; i < notes.size(); i++) {
+                // Kiểm tra nếu ID của ghi chú trùng với ID của note cần thêm
+                if (notes.get(i).getId().equals(note.getId())) {
+                    System.out.println("Found note with ID: " + note.getId() + " at index " + i);
+                    // Nếu ghi chú đã tồn tại, cập nhật lại ghi chú đó
+                    notes.set(i, note);
+                    isExist = true;
+                    break;  // Dừng vòng lặp sau khi tìm thấy
+                }
+            }
+
+            // Kiểm tra kết quả của việc tìm thấy ghi chú
+            if (!isExist) {
+                System.out.println("Note with ID " + note.getId() + " not found. Adding new note.");
+                notes.add(note); // Thêm ghi chú mới vào danh sách
+            }
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                DatabaseReference ref = FirebaseDatabase.getInstance()
+                        .getReference("users")
+                        .child(user.getUid())
+                        .child("notebooks")
+                        .child(notebookId)
+                        .child("notes")
+                        .child(note.getId());
+
+                ref.setValue(note)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("DataProvider", "Ghi chú đã được lưu Firebase.");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("DataProvider", "Lỗi khi lưu ghi chú: " + e.getMessage());
+                        });
+            }
         }
     }
 

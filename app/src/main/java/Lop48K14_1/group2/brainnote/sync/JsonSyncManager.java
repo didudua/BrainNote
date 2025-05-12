@@ -86,7 +86,7 @@ public class JsonSyncManager {
                 username = email.substring(0, email.indexOf("@"));
             }
         }
-        String jsonData = exportDataAsJson();
+            String jsonData = exportDataAsJson();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference userRef = database.getReference("users").child(userId);

@@ -8,12 +8,14 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,9 +66,17 @@ public class NoteDetailFragment extends Fragment {
 
         // Get args
         Bundle args = getArguments();
+        if (args == null) {
+            Log.e("NoteDetailFragment", "Arguments are null!");
+        } else {
+            Log.d("NoteDetailFragment", "NOTE_ID in args = " + args.getString("NOTEBOOK_ID"));
+        }
         if (args != null) {
             originalNotebookId = args.getString("NOTEBOOK_ID");
             noteId             = args.getString("NOTE_ID", "");
+
+            Log.d("NoteDetailFragment", "NOTE_ID: " + noteId);
+            Log.d("NoteDetailFragment", "NOTEBOOK_ID: " + originalNotebookId);
         } else {
             // Default to first notebook for new note
             originalNotebookId = notebooks.get(0).getId();
@@ -93,6 +103,19 @@ public class NoteDetailFragment extends Fragment {
                     .show();
         });
 
+        Notebook debugNotebook = DataProvider.getNotebookById(originalNotebookId);
+
+        if (debugNotebook == null) {
+            Log.e("NoteDetailFragment", "Notebook is NULL! ID = " + originalNotebookId);
+        } else {
+            Log.d("NoteDetailFragment", "Notebook found. ID = " + originalNotebookId);
+            Log.d("NoteDetailFragment", "Notebook name: " + debugNotebook.getName());
+            Log.d("NoteDetailFragment", "Notebook contains " + debugNotebook.getNotes().size() + " notes");
+
+            for (Note n : debugNotebook.getNotes()) {
+                Log.d("NoteDetailFragment", "Note ID = " + n.getId() + ", Title = " + n.getTitle());
+            }
+        }
         // Load existing note if editing
         if (!TextUtils.isEmpty(noteId)) {
             note = DataProvider.getNotebookById(originalNotebookId)
@@ -123,7 +146,7 @@ public class NoteDetailFragment extends Fragment {
         if (note == null) {
             // Create new note
             String newId = UUID.randomUUID().toString();
-            Note newNote = new Note(newId, newTitle, newContent, now, notebookId);
+            Note newNote = new Note(newId, notebookId, newTitle, newContent, now);
             DataProvider.addNoteToNotebook(notebookId, newNote);
         } else {
             // Update existing
@@ -132,7 +155,11 @@ public class NoteDetailFragment extends Fragment {
             note.setDate(now);
             // Move if notebook changed
             if (!notebookId.equals(originalNotebookId)) {
-                DataProvider.removeNoteFromNotebook(originalNotebookId, noteId);
+                // Notebook changed → move note
+                DataProvider.removeNoteFromNotebook(originalNotebookId, note.getId());
+                DataProvider.addNoteToNotebook(notebookId, note);
+            } else {
+                // Notebook not changed → update using addNoteToNotebook (handles overwrite)
                 DataProvider.addNoteToNotebook(notebookId, note);
             }
         }

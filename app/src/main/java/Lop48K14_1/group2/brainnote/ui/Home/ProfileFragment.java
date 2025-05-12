@@ -116,10 +116,6 @@ public class ProfileFragment extends Fragment {
     private void logout() {
         // Xóa dữ liệu cục bộ
         clearLocalData();
-
-        // Xóa dữ liệu trong DataProvider
-        DataProvider.clearData();
-
         // Đăng xuất khỏi Firebase
         FirebaseAuth.getInstance().signOut();
 

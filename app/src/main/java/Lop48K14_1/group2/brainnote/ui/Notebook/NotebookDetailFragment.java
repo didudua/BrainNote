@@ -57,15 +57,14 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         if (args != null) {
             notebookId = args.getString("NOTEBOOK_ID");
         }
-
         notebook = DataProvider.getNotebookById(notebookId);
-
         if (notebook == null) {
-            Log.e("NotebookDetailFragment", "Notebook not found for ID: " + notebookId);
-            if (getActivity() != null) {
-                getActivity().getSupportFragmentManager().popBackStack();
+            Log.e("NoteDetailFragment", "Notebook not found for ID: " + notebookId);
+        } else {
+            Log.d("NoteDetailFragment", "Notebook found: " + notebook.getName());
+            for (Note n : notebook.getNotes()) {
+                Log.d("NoteDetailFragment", "Existing note: " + n.getId() + " - " + n.getTitle());
             }
-            return view;
         }
 
         // Khởi tạo views
@@ -166,6 +165,8 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         args.putString("NOTE_ID", clickedNote.getId());
         NavController nav = NavHostFragment.findNavController(this);
         nav.navigate(R.id.action_notebookDetailFragment_to_nav_note_detail, args);
+        Log.d("NoteDetailFragment", "NOTE_ID: " + clickedNote.getId());
+        Log.d("NoteDetailFragment", "NOTEBOOK_ID: " + clickedNote.getNotebookId());
     }
 
     @Override
@@ -207,23 +208,36 @@ public class NotebookDetailFragment extends Fragment implements NoteAdapter.OnNo
         // Cập nhật lại dữ liệu khi quay lại fragment
         notebook = DataProvider.getNotebookById(notebookId);
         if (notebook != null) {
-            notes.clear();
-            notes.addAll(notebook.getNotes());
-            if (searchEditText != null && searchEditText.getText() != null) {
-                filterNotes(searchEditText.getText().toString());
-            } else {
-                filteredNotes.clear();
-                filteredNotes.addAll(notes);
-                if (adapter != null) {
-                    adapter.notifyDataSetChanged();
-                }
-                updateNoteCount();
-            }
+            reloadNotes();
         } else {
             Log.e("NotebookDetailFragment", "Notebook not found in onResume for ID: " + notebookId);
             if (getActivity() != null) {
                 getActivity().getSupportFragmentManager().popBackStack();
             }
+        }
+    }
+    private void reloadNotes() {
+        // Giữ lại ghi chú cũ và chỉ thêm ghi chú mới
+        if (notebook != null) {
+            List<Note> newNotes = notebook.getNotes();
+            // Kiểm tra và thêm các ghi chú mới nếu chưa có trong danh sách
+            for (Note newNote : newNotes) {
+                boolean exists = false;
+                for (Note existingNote : notes) {
+                    if (existingNote.getId().equals(newNote.getId())) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    notes.add(newNote);
+                }
+            }
+
+            filteredNotes.clear();
+            filteredNotes.addAll(notes);
+            adapter.notifyDataSetChanged();
+            updateNoteCount();
         }
     }
 }

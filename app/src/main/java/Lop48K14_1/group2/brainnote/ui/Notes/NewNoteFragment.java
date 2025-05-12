@@ -82,13 +82,12 @@ public class NewNoteFragment extends Fragment {
 
         return view;
     }
-
     private void saveNote() {
         String title   = titleEditText.getText().toString().trim();
         String content = contentEditText.getText().toString().trim();
 
         if (title.isEmpty()) {
-            title = "Tài liệu không có tiêu đề";
+            title = "Tài liệu không có tiêu đề +wqhjd";
         }
         if (content.isEmpty()) {
             content = "";
@@ -102,10 +101,9 @@ public class NewNoteFragment extends Fragment {
                 content,
                 new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy", Locale.getDefault()).format(new Date())
         );
-
+        DataProvider.addNoteToNotebook(notebookId, note);
         if (notebook!=null) {
             DataProvider.addNoteToNotebook(notebookId, note);
-
             // Sync ra file + Firebase
             JsonSyncManager.saveNotebooksToFile(getContext());
             JsonSyncManager.uploadNotebooksToFirebase();
