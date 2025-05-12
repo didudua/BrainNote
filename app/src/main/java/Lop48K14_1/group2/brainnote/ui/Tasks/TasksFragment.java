@@ -1,8 +1,6 @@
 package Lop48K14_1.group2.brainnote.ui.Tasks;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,13 +31,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.ui.Home.HeaderFragment;
@@ -63,8 +56,6 @@ public class TasksFragment extends Fragment {
     private FirebaseUser currentUser;
     private ValueEventListener tasksListener;
     private NavController navController;
-    private SharedPreferences preferences;
-    private String currentSortOption = "By Creation Date"; // Default sort
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -81,9 +72,6 @@ public class TasksFragment extends Fragment {
             Log.e("TasksFragment", "No user logged in");
             Toast.makeText(getContext(), "Please log in to view tasks", Toast.LENGTH_SHORT).show();
         }
-
-        // Initialize SharedPreferences
-        preferences = getContext().getSharedPreferences("TaskFilterPrefs", Context.MODE_PRIVATE);
 
         // Initialize NavController
         navController = NavHostFragment.findNavController(this);
@@ -157,61 +145,16 @@ public class TasksFragment extends Fragment {
                 incompleteTasks.clear();
                 completedTasks.clear();
 
-                // Load filter preferences
-                boolean showFlagged = preferences.getBoolean("show_flagged", false);
-                boolean showDueDate = preferences.getBoolean("show_due_date", false);
-                boolean showCompleted = preferences.getBoolean("show_completed", true);
-                boolean priorityLow = preferences.getBoolean("priority_low", false);
-                boolean priorityMedium = preferences.getBoolean("priority_medium", false);
-                boolean priorityHigh = preferences.getBoolean("priority_high", false);
-                List<Integer> selectedPriorities = new ArrayList<>();
-                if (priorityLow) selectedPriorities.add(0);
-                if (priorityMedium) selectedPriorities.add(1);
-                if (priorityHigh) selectedPriorities.add(2);
-
-                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault());
-                long currentTime = System.currentTimeMillis();
-
                 for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
                     Task task = taskSnapshot.getValue(Task.class);
                     if (task != null) {
-                        boolean passesFilter = true;
-
-                        // Apply flagged filter
-                        if (showFlagged && !task.isFlagged()) {
-                            passesFilter = false;
-                        }
-
-                        // Apply due date filter
-                        if (showDueDate && task.getDueDate() != null && !task.getDueDate().isEmpty()) {
-                            try {
-                                long dueDateTime = dateFormat.parse(task.getDueDate()).getTime();
-                                if (dueDateTime < currentTime) {
-                                    passesFilter = false;
-                                }
-                            } catch (ParseException e) {
-                                Log.e("TasksFragment", "Error parsing due date: " + e.getMessage());
-                            }
-                        }
-
-                        // Apply priority filter
-                        if (!selectedPriorities.isEmpty() && !selectedPriorities.contains(task.getPriority())) {
-                            passesFilter = false;
-                        }
-
-                        // Add task to appropriate list based on completion status
-                        if (passesFilter) {
-                            if (task.isCompleted() && showCompleted) {
-                                completedTasks.add(task);
-                            } else if (!task.isCompleted()) {
-                                incompleteTasks.add(task);
-                            }
+                        if (task.isCompleted()) {
+                            completedTasks.add(task);
+                        } else {
+                            incompleteTasks.add(task);
                         }
                     }
                 }
-
-                // Apply sorting
-                applySorting();
 
                 updateUI();
                 taskAdapter.notifyDataSetChanged();
@@ -224,17 +167,6 @@ public class TasksFragment extends Fragment {
             }
         };
         tasksRef.addValueEventListener(tasksListener);
-    }
-
-    private void applySorting() {
-        Comparator<Task> comparator;
-        if (currentSortOption.equals("By Priority")) {
-            comparator = (task1, task2) -> Integer.compare(task2.getPriority(), task1.getPriority());
-        } else {
-            comparator = (task1, task2) -> task1.getId().compareTo(task2.getId());
-        }
-        Collections.sort(incompleteTasks, comparator);
-        Collections.sort(completedTasks, comparator);
     }
 
     private void updateUI() {
@@ -254,7 +186,6 @@ public class TasksFragment extends Fragment {
             completedTasksHeader.setText(getString(R.string.completed_tasks_format, completedTasks.size()));
         }
     }
-
     private void filterTasks(String query) {
         List<Task> filteredIncompleteTasks = new ArrayList<>();
         List<Task> filteredCompletedTasks = new ArrayList<>();
@@ -273,7 +204,6 @@ public class TasksFragment extends Fragment {
 
         taskAdapter.updateTasks(filteredIncompleteTasks, filteredCompletedTasks);
     }
-
     private void onTaskStatusChanged(Task task, boolean isCompleted) {
         if (tasksRef == null || task == null || task.getId() == null) {
             Log.e("TasksFragment", "Invalid task or database reference");
@@ -329,11 +259,5 @@ public class TasksFragment extends Fragment {
 
     public List<Task> getCompletedTasks() {
         return completedTasks;
-    }
-
-    public void setSortOption(String sortOption) {
-        this.currentSortOption = sortOption;
-        applySorting();
-        taskAdapter.notifyDataSetChanged();
     }
 }

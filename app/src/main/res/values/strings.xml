@@ -7,7 +7,6 @@
     <string name="create_account" translatable="false">Tạo tài khoản</string>
     <string name="sign_in" translatable="false">Đăng nhập</string>
     <string name="default_web_client_id">942344742128-ci83il9l08mud0uh0fmtnjgq4c3plj5a.apps.googleusercontent.com</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- Tasks -->
     <string name="empty_tasks_title">Tạo công việc đầu tiên của bạn</string>
@@ -16,14 +15,12 @@
     <string name="search_tasks">Tìm nhiệm vụ</string>
     <string name="incomplete_tasks_format">Công việc của bạn (%d)</string>
     <string name="completed_tasks_format">Hoàn thành (%d)</string>
-
     <!-- Task Actions -->
     <string name="add_task">Nhiệm vụ</string>
     <string name="edit_task">Chỉnh sửa nhiệm vụ</string>
     <string name="filter_tasks">Lọc nhiệm vụ</string>
     <string name="done">Xong</string>
     <string name="reset">Lặp lại</string>
-
     <!-- Task Fields -->
     <string name="task_title_hint">Nhập tiêu đề nhiệm vụ</string>
     <string name="description_hint">Thêm mô tả</string>
@@ -36,7 +33,6 @@
     <string name="medium_priority">Trung bình</string>
     <string name="high_priority">Cao</string>
     <string name="flag_task">Đánh dấu</string>
-
     <!-- Filter Options -->
     <string name="reset_filter">Lặp lại</string>
     <string name="flagged_items">Được đánh dấu</string>
@@ -46,13 +42,17 @@
     <string name="low">Thấp</string>
     <string name="medium">Trung bình</string>
     <string name="high">Cao</string>
-
     <!-- Task Options -->
     <string name="view_mode">Chế độ xem</string>
     <string name="sort_by">Sắp xếp theo</string>
     <string name="filter">Lọc</string>
     <string name="settings">Cài đặt</string>
-
+    <string name="all_tasks">Tất cả nhiệm vụ</string>
+    <string name="completed_tasks">Nhiệm vụ đã hoàn thành</string>
+    <string name="incomplete_tasks">Nhiệm vụ chưa hoàn thành</string>
+    <string name="high_to_low_priority">Ưu tiên cao đến thấp</string>
+    <string name="low_to_high_priority">Ưu tiên thấp đến cao</string>
+    <string name="by_creation_date">Theo ngày tạo</string>
     <!-- Messages -->
     <string name="error_empty_title">Tiêu đề không thể để trống</string>
     <string name="task_added_success">Nhiệm vụ đã được thêm</string>

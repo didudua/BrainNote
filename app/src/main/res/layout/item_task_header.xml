@@ -1,16 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
-    android:gravity="center_vertical">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/header_text"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textColor="@android:color/black" />
 
@@ -18,6 +16,6 @@
         android:id="@+id/header_toggle"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_arrow_down" />
-
+        android:src="@drawable/ic_arrow_down"
+        android:contentDescription="Toggle section" />
 </LinearLayout>
