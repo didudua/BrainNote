@@ -1,13 +1,19 @@
 package Lop48K14_1.group2.brainnote.ui.Tasks;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -18,9 +24,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,7 +49,7 @@ import Lop48K14_1.group2.brainnote.ui.Home.HeaderFragment;
 import Lop48K14_1.group2.brainnote.ui.adapters.TaskAdapter;
 import Lop48K14_1.group2.brainnote.ui.models.Task;
 
-public class TasksFragment extends Fragment {
+public class TasksFragment extends Fragment implements TaskAdapter.TaskStatusChangeListener {
 
     private View emptyStateView;
     private RecyclerView recyclerView;
@@ -58,6 +66,7 @@ public class TasksFragment extends Fragment {
     private FirebaseUser currentUser;
     private ValueEventListener tasksListener;
     private NavController navController;
+    private int swipedPosition = -1;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -87,7 +96,6 @@ public class TasksFragment extends Fragment {
         completedTasksHeader = view.findViewById(R.id.completed_tasks_header);
         addTaskButton = view.findViewById(R.id.add_task_button);
         filterButton = view.findViewById(R.id.btn_filter);
-        moreButton = view.findViewById(R.id.btn_more);
 
         // Kiểm tra ánh xạ
         if (incompleteTasksHeader == null) {
@@ -104,7 +112,7 @@ public class TasksFragment extends Fragment {
         editor.apply();
 
         // Khởi tạo taskAdapter
-        taskAdapter = new TaskAdapter(getContext(), incompleteTasks, completedTasks, this::onTaskStatusChanged, navController);
+        taskAdapter = new TaskAdapter(getContext(), incompleteTasks, completedTasks, this, navController);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(taskAdapter);
 
@@ -126,6 +134,7 @@ public class TasksFragment extends Fragment {
         preferences.registerOnSharedPreferenceChangeListener((sharedPrefs, key) -> applyFilters(searchEditText.getText().toString()));
 
         loadTasks();
+        setupSwipeToDelete();
 
         addTaskButton.setOnClickListener(v -> {
             try {
@@ -141,7 +150,199 @@ public class TasksFragment extends Fragment {
                     .replace(R.id.headerContainer, new HeaderFragment())
                     .commit();
         }
+
+        // Đóng mục khi chạm ngoài
+        recyclerView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN && swipedPosition != -1) {
+                RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(swipedPosition);
+                if (holder != null) {
+                    float x = event.getX();
+                    float y = event.getY();
+                    View itemView = holder.itemView;
+
+                    // Kiểm tra chạm vào nút Xóa
+                    float buttonWidth = itemView.getWidth() * 0.15f;
+                    float deleteLeft = itemView.getRight() - buttonWidth;
+                    if (x >= deleteLeft && x <= itemView.getRight() && y >= itemView.getTop() && y <= itemView.getBottom()) {
+                        int position = swipedPosition;
+                        Task task;
+                        boolean isCompleted;
+
+                        // Xác định task và trạng thái dựa trên vị trí
+                        int incompleteCount = taskAdapter.getIncompleteTasks().size();
+                        if (taskAdapter.getItemViewType(position) == 2) { // TYPE_TASK_INCOMPLETE
+                            task = taskAdapter.getIncompleteTasks().get(position - 1);
+                            isCompleted = false;
+                        } else {
+                            task = taskAdapter.getCompletedTasks().get(position - incompleteCount - 3);
+                            isCompleted = true;
+                        }
+
+                        onDeleteTask(task, position, isCompleted);
+                        swipedPosition = -1;
+                        return true;
+                    }
+
+                    // Đóng mục nếu chạm ngoài
+                    itemView.animate().translationX(0).setDuration(100).start();
+                    swipedPosition = -1;
+                }
+            }
+            return false;
+        });
+
         return view;
+    }
+
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                // Lấy vị trí của viewHolder
+                int position = viewHolder.getAdapterPosition();
+                if (position == RecyclerView.NO_POSITION) return 0;
+
+                // Kiểm tra loại item dựa trên getItemViewType
+                int viewType = taskAdapter.getItemViewType(position);
+                // Chỉ cho phép vuốt sang trái trên các item task
+                return (viewType == 2 || viewType == 3) ? ItemTouchHelper.LEFT : 0; // TYPE_TASK_INCOMPLETE = 2, TYPE_TASK_COMPLETED = 3
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                // Không xử lý onSwiped để giữ mục mở
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                View itemView = viewHolder.itemView;
+                float buttonWidth = itemView.getWidth() * 0.15f; // Nút chiếm 15% chiều rộng
+                float maxDx = buttonWidth; // Giới hạn dịch chuyển tối đa
+
+                // Xác định translationX (chỉ cho phép vuốt trái)
+                float translationX = Math.max(dX, -maxDx);
+
+                // Dịch chuyển itemView
+                if (isCurrentlyActive) {
+                    itemView.setTranslationX(translationX);
+                } else {
+                    itemView.animate().translationX(translationX).setDuration(100).start();
+                }
+
+                // Vẽ nút Xóa nếu đang vuốt trái
+                if (translationX < 0) {
+                    // Vẽ nền trắng cho vùng hành động
+                    ColorDrawable background = new ColorDrawable(Color.WHITE);
+                    background.setBounds((int) (itemView.getRight() - maxDx), itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                    background.draw(c);
+
+                    // Vẽ nút Xóa (màu đỏ)
+                    Drawable deleteIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete);
+                    ColorDrawable deleteBackground = new ColorDrawable(Color.parseColor("#FF0000"));
+                    int deleteIntrinsicWidth = deleteIcon.getIntrinsicWidth();
+                    int deleteIntrinsicHeight = deleteIcon.getIntrinsicHeight();
+
+                    int deleteLeft = (int) (itemView.getRight() - buttonWidth);
+                    int deleteRight = itemView.getRight();
+                    int deleteTop = itemView.getTop();
+                    int deleteBottom = itemView.getBottom();
+
+                    deleteBackground.setBounds(deleteLeft, deleteTop, deleteRight, deleteBottom);
+                    deleteBackground.draw(c);
+
+                    // Căn giữa biểu tượng thùng rác
+                    int deleteIconMarginVertical = (deleteBottom - deleteTop - deleteIntrinsicHeight) / 2;
+                    int deleteIconTop = deleteTop + deleteIconMarginVertical;
+                    int deleteIconBottom = deleteIconTop + deleteIntrinsicHeight;
+                    int deleteIconMarginHorizontal = (deleteRight - deleteLeft - deleteIntrinsicWidth) / 2;
+                    int deleteIconLeft = deleteLeft + deleteIconMarginHorizontal;
+                    int deleteIconRight = deleteIconLeft + deleteIntrinsicWidth;
+
+                    deleteIcon.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom);
+                    deleteIcon.draw(c);
+                }
+
+                super.onChildDraw(c, recyclerView, viewHolder, translationX, dY, actionState, isCurrentlyActive);
+
+                // Lưu vị trí mục đang mở
+                if (translationX < 0 && !isCurrentlyActive) {
+                    swipedPosition = viewHolder.getAdapterPosition();
+                } else if (translationX == 0) {
+                    swipedPosition = -1;
+                }
+            }
+
+            @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.5f;
+            }
+
+            @Override
+            public float getSwipeEscapeVelocity(float defaultValue) {
+                return defaultValue * 0.5f;
+            }
+
+            @Override
+            public float getSwipeVelocityThreshold(float defaultValue) {
+                return defaultValue * 0.5f;
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void onDeleteTask(Task task, int position, boolean isCompleted) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc muốn xóa task \"" + task.getTitle() + "\"? Hành động này không thể hoàn tác.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    // Lưu task để hoàn tác
+                    Task deletedTask = task;
+                    int deletedPosition = position;
+                    boolean wasCompleted = isCompleted;
+
+                    // Xóa task khỏi danh sách
+                    if (isCompleted) {
+                        completedTasks.remove(task);
+                    } else {
+                        incompleteTasks.remove(task);
+                    }
+                    taskAdapter.notifyItemRemoved(position);
+
+                    // Xóa task khỏi Firebase
+                    tasksRef.child(task.getId()).removeValue()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(getContext(), "Task đã bị xóa", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Nếu xóa thất bại, khôi phục task
+                                if (wasCompleted) {
+                                    completedTasks.add(deletedTask);
+                                } else {
+                                    incompleteTasks.add(deletedTask);
+                                }
+                                taskAdapter.notifyDataSetChanged();
+                                Toast.makeText(getContext(), "Không thể xóa task: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+
+                    // Cập nhật UI
+                    applyFilters(searchEditText != null ? searchEditText.getText().toString() : "");
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> {
+                    // Đóng mục
+                    RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(position);
+                    if (holder != null) {
+                        holder.itemView.animate().translationX(0).setDuration(100).start();
+                    }
+                    swipedPosition = -1;
+                })
+                .show();
     }
 
     private void applyFilters(String searchQuery) {
@@ -300,7 +501,17 @@ public class TasksFragment extends Fragment {
         }
     }
 
-    private void onTaskStatusChanged(Task task, boolean isCompleted) {
+    private void openFilterTasksFragment() {
+        try {
+            navController.navigate(R.id.action_tasksFragment_to_filterTasksFragment);
+        } catch (Exception e) {
+            Log.e("TasksFragment", "Navigation error: " + e.getMessage());
+            Toast.makeText(getContext(), "Cannot navigate to Filter Tasks", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onTaskStatusChanged(Task task, boolean isCompleted) {
         if (tasksRef == null || task == null || task.getId() == null) {
             Log.e("TasksFragment", "Invalid task or database reference");
             Toast.makeText(getContext(), "Cannot update task status", Toast.LENGTH_SHORT).show();
@@ -317,16 +528,6 @@ public class TasksFragment extends Fragment {
                     Toast.makeText(getContext(), "Failed to update task", Toast.LENGTH_SHORT).show();
                 });
     }
-
-    private void openFilterTasksFragment() {
-        try {
-            navController.navigate(R.id.action_tasksFragment_to_filterTasksFragment);
-        } catch (Exception e) {
-            Log.e("TasksFragment", "Navigation error: " + e.getMessage());
-            Toast.makeText(getContext(), "Cannot navigate to Filter Tasks", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     @Override
     public void onDestroyView() {

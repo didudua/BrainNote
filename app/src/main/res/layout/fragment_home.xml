@@ -50,14 +50,6 @@
             android:textAlignment="center"/>
 
         <!-- Thanh tìm kiếm -->
-        <EditText
-            android:id="@+id/searchEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/search_background"
-            android:hint="Tìm bất kỳ ghi chú,..."
-            android:padding="8dp"
-            android:singleLine="true" />
 
         <!-- Grid các card -->
         <GridLayout

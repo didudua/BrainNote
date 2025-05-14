@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
@@ -62,7 +63,15 @@ public class NotebookAdapter extends RecyclerView.Adapter<NotebookAdapter.Notebo
     public int getItemCount() {
         return notebooks.size();
     }
+    public void updateNotebooks(List<Notebook> newNotebooks) {
+        this.notebooks = newNotebooks != null ? new ArrayList<>(newNotebooks) : new ArrayList<>();
+        notifyDataSetChanged();
+    }
 
+    // Phương thức để lấy danh sách sổ tay
+    public List<Notebook> getNotebooks() {
+        return new ArrayList<>(notebooks);
+    }
     public class NotebookViewHolder extends RecyclerView.ViewHolder {
         ImageView iconImageView;
         TextView nameTextView;

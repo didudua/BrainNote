@@ -26,7 +26,7 @@ import Lop48K14_1.group2.brainnote.ui.models.Task;
 public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_HEADER_INCOMPLETE = 0;
     private static final int TYPE_HEADER_COMPLETED = 1;
-    private static final int TYPE_TASK_INCOMPLETE = 2;
+    public static final int TYPE_TASK_INCOMPLETE = 2;
     private static final int TYPE_TASK_COMPLETED = 3;
     private static final int TYPE_DIVIDER = 4;
     private List<Task> incompleteTasks = new ArrayList<>();
