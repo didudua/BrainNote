@@ -32,11 +32,11 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/reset_button"
+            android:id="@+id/filter_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:text="@string/reset"
+            android:text="@string/done"
             android:textColor="@color/blue_500" />
     </LinearLayout>
 
@@ -81,61 +81,8 @@
         </LinearLayout>
 
         <!-- Due Date -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_calendar" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_weight="1"
-                android:text="@string/due_date"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-
-            <Switch
-                android:id="@+id/due_date_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
 
         <!-- Completed -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_check_circle" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_weight="1"
-                android:text="@string/completed"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-
-            <Switch
-                android:id="@+id/completed_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-        </LinearLayout>
 
         <!-- Priority -->
         <LinearLayout

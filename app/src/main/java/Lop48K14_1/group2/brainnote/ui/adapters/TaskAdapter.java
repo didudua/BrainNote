@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Lop48K14_1.group2.brainnote.R;
@@ -28,10 +29,9 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_TASK_INCOMPLETE = 2;
     private static final int TYPE_TASK_COMPLETED = 3;
     private static final int TYPE_DIVIDER = 4;
-
+    private List<Task> incompleteTasks = new ArrayList<>();
+    private List<Task> completedTasks = new ArrayList<>();
     private Context context;
-    private List<Task> incompleteTasks;
-    private List<Task> completedTasks;
     private TaskStatusChangeListener statusChangeListener;
     private NavController navController;
     private boolean isIncompleteExpanded = true;
@@ -66,7 +66,13 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return TYPE_TASK_COMPLETED;
         }
     }
+    public List<Task> getIncompleteTasks() {
+        return incompleteTasks;
+    }
 
+    public List<Task> getCompletedTasks() {
+        return completedTasks;
+    }
     @Override
     public int getItemCount() {
         int count = 1; // Header incomplete

@@ -1,5 +1,6 @@
 package Lop48K14_1.group2.brainnote.ui.Tasks;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,22 +33,21 @@ public class FilterTasksFragment extends Fragment {
     private static final String KEY_PRIORITY_HIGH = "priority_high";
 
     private ImageButton closeButton;
-    private Button resetButton;
-    private Switch flaggedSwitch, dueDateSwitch, completedSwitch;
+    private Button filterButton;
+    private Switch flaggedSwitch;
     private ChipGroup priorityChipGroup;
     private TextView headerTitle;
     private SharedPreferences preferences;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filter_tasks, container, false);
 
         // Initialize views
         closeButton = view.findViewById(R.id.close_button);
-        resetButton = view.findViewById(R.id.reset_button);
+        filterButton = view.findViewById(R.id.filter_button);
         flaggedSwitch = view.findViewById(R.id.flagged_switch);
-        dueDateSwitch = view.findViewById(R.id.due_date_switch);
-        completedSwitch = view.findViewById(R.id.completed_switch);
         priorityChipGroup = view.findViewById(R.id.priority_chip_group);
         headerTitle = view.findViewById(R.id.header_title);
 
@@ -62,15 +62,11 @@ public class FilterTasksFragment extends Fragment {
 
         // Set up click listeners
         closeButton.setOnClickListener(v -> navigateBack());
-        resetButton.setOnClickListener(v -> resetFilters());
+        filterButton.setOnClickListener(v -> doneFilters());
 
         // Set up switch listeners
         flaggedSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
                 savePreference(KEY_FLAGGED, isChecked));
-        dueDateSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
-                savePreference(KEY_DUE_DATE, isChecked));
-        completedSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
-                savePreference(KEY_COMPLETED, isChecked));
 
         // Set up priority chip listeners
         priorityChipGroup.setOnCheckedChangeListener((group, checkedId) -> savePriorityPreferences());
@@ -80,9 +76,6 @@ public class FilterTasksFragment extends Fragment {
 
     private void loadPreferences() {
         flaggedSwitch.setChecked(preferences.getBoolean(KEY_FLAGGED, false));
-        dueDateSwitch.setChecked(preferences.getBoolean(KEY_DUE_DATE, false));
-        completedSwitch.setChecked(preferences.getBoolean(KEY_COMPLETED, true));
-
         // Load priority preferences
         ((Chip) priorityChipGroup.findViewById(R.id.chip_low)).setChecked(
                 preferences.getBoolean(KEY_PRIORITY_LOW, false));
@@ -109,24 +102,15 @@ public class FilterTasksFragment extends Fragment {
         editor.apply();
     }
 
-    private void resetFilters() {
-        flaggedSwitch.setChecked(false);
-        dueDateSwitch.setChecked(false);
-        completedSwitch.setChecked(true);
+    private void doneFilters() {
+        // Lưu trạng thái của flagged switch
+        savePreference(KEY_FLAGGED, flaggedSwitch.isChecked());
 
-        // Reset priority chips
-        ((Chip) priorityChipGroup.findViewById(R.id.chip_low)).setChecked(false);
-        ((Chip) priorityChipGroup.findViewById(R.id.chip_medium)).setChecked(false);
-        ((Chip) priorityChipGroup.findViewById(R.id.chip_high)).setChecked(false);
+        // Lưu trạng thái của priority chips
+        savePriorityPreferences();
 
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(KEY_FLAGGED, false);
-        editor.putBoolean(KEY_DUE_DATE, false);
-        editor.putBoolean(KEY_COMPLETED, true);
-        editor.putBoolean(KEY_PRIORITY_LOW, false);
-        editor.putBoolean(KEY_PRIORITY_MEDIUM, false);
-        editor.putBoolean(KEY_PRIORITY_HIGH, false);
-        editor.apply();
+        // Đóng fragment
+        navigateBack();
     }
 
     private void navigateBack() {
