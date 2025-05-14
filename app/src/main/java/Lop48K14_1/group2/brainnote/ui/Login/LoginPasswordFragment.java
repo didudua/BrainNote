@@ -134,6 +134,7 @@ public class LoginPasswordFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 // Làm mới dữ liệu sau khi đăng ký tài khoản mới
                                 DataProvider.clearData();
+                                JsonSyncManager.uploadNotebooksToFirebase();
                                 JsonSyncManager.uploadaccountcreatedAtToFirebase();
                                 Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
                                 ((MainActivity) requireActivity()).loadFragment(new LoginFragment());

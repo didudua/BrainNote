@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -48,6 +49,27 @@ public class NewNoteFragment extends Fragment {
 
         // 1. Lấy danh sách sổ
         notebooks = DataProvider.getNotebooks();
+
+        if (notebooks == null || notebooks.isEmpty()) {
+            String id = UUID.randomUUID().toString();
+            String name = "Sổ mặc định";
+
+            notebook = new Notebook(id, name, new ArrayList<>());
+            DataProvider.addNotebook(notebook);
+
+            // Lưu vào bộ nhớ cục bộ
+            try {
+                JsonSyncManager.saveNotebooksToFile(getContext());
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Lỗi khi lưu sổ mặc định: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            // Đồng bộ Firebase
+            JsonSyncManager.uploadNotebooksToFirebase();
+
+            // Lấy lại danh sách notebooks
+            notebooks = DataProvider.getNotebooks();
+        }
 
         // 2. Khởi tạo giá trị mặc định
         if (getArguments() != null && getArguments().containsKey("NOTEBOOK_ID")) {
@@ -87,7 +109,7 @@ public class NewNoteFragment extends Fragment {
         String content = contentEditText.getText().toString().trim();
 
         if (title.isEmpty()) {
-            title = "Tài liệu không có tiêu đề +wqhjd";
+            title = "Tài liệu không có tiêu đề";
         }
         if (content.isEmpty()) {
             content = "";
@@ -101,7 +123,6 @@ public class NewNoteFragment extends Fragment {
                 content,
                 new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy", Locale.getDefault()).format(new Date())
         );
-        DataProvider.addNoteToNotebook(notebookId, note);
         if (notebook!=null) {
             DataProvider.addNoteToNotebook(notebookId, note);
             // Sync ra file + Firebase
