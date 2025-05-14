@@ -1,8 +1,5 @@
 package Lop48K14_1.group2.brainnote.ui.Login;
 
-
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,18 +36,9 @@ import Lop48K14_1.group2.brainnote.R;
 import Lop48K14_1.group2.brainnote.sync.JsonSyncManager;
 import Lop48K14_1.group2.brainnote.ui.Home.HomeFragment;
 import Lop48K14_1.group2.brainnote.ui.MainHomeActivity;
-import Lop48K14_1.group2.brainnote.ui.models.Notebook;
 import Lop48K14_1.group2.brainnote.ui.utils.DataProvider;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class LoginPasswordFragment extends Fragment {
     private static final String PREFS_NAME      = "BrainNotePrefs";
@@ -147,9 +135,6 @@ public class LoginPasswordFragment extends Fragment {
                                 // Làm mới dữ liệu sau khi đăng ký tài khoản mới
                                 DataProvider.clearData();
                                 JsonSyncManager.uploadaccountcreatedAtToFirebase();
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                createDefaultNotebookForNewAccount(user);
-
                                 Toast.makeText(getContext(), "Tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
                                 ((MainActivity) requireActivity()).loadFragment(new LoginFragment());
                             } else {
@@ -202,53 +187,18 @@ public class LoginPasswordFragment extends Fragment {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
+                        // Làm mới dữ liệu trước khi chuyển sang MainHomeActivity
+                        DataProvider.clearData();
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            // Kiểm tra xem tài khoản người dùng đã có trong Firebase chưa
-                            checkIfUserExistsAndCreateDefaultNotebook(user);
-                        }
-
+                        saveEmail(user.getEmail());
+                        Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), MainHomeActivity.class);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(getContext(), "Xác thực Firebase thất bại", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-
-    private void checkIfUserExistsAndCreateDefaultNotebook(FirebaseUser user) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
-
-        userRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DataSnapshot snapshot = task.getResult();
-                if (!snapshot.exists()) {
-                    // Nếu người dùng chưa có dữ liệu, tạo một notebook mặc định
-                    createDefaultNotebookForNewAccount(user);
-                } else {
-                    // Nếu người dùng đã có dữ liệu, tiếp tục
-                    Log.d("Login", "User exists, no need to create a default notebook.");
-                }
-                saveEmail(user.getEmail());
-                JsonSyncManager.uploadNotebooksToFirebase();
-                Toast.makeText(getContext(), "Chào mừng: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), MainHomeActivity.class);
-                startActivity(intent);
-            } else {
-                Log.e("Login", "Error checking user existence: " + task.getException().getMessage());
-            }
-        });
-    }
-    private void createDefaultNotebookForNewAccount(FirebaseUser user) {
-        Notebook newNotebook = new Notebook(
-                UUID.randomUUID().toString(),
-                "Notebook Mặc Định",
-                new ArrayList<>(),
-                true
-        );
-        DataProvider.addNotebook(newNotebook);
-        JsonSyncManager.saveNotebooksToFile(getContext());
-        JsonSyncManager.uploadNotebooksToFirebase();
-    }
-
     private void saveEmail(String email) {
         prefs.edit()
                 .putString(KEY_LAST_EMAIL, email)

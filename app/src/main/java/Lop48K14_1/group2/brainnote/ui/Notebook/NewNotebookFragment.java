@@ -73,8 +73,7 @@ public class NewNotebookFragment extends Fragment {
         Notebook newNotebook = new Notebook(
                 UUID.randomUUID().toString(),
                 name,
-                new ArrayList<>(),
-                false
+                new ArrayList<>()
         );
 
         // Thêm sổ tay vào danh sách

@@ -116,7 +116,6 @@ public class DataProvider {
                 JSONObject notebookObj = new JSONObject();
                 notebookObj.put("id", notebook.getId());
                 notebookObj.put("name", notebook.getName());
-                notebookObj.put("isDefault", notebook.getDefault());
 
                 JSONArray notesArray = new JSONArray();
                 for (Note note : notebook.getNotes()) {
@@ -162,11 +161,6 @@ public class DataProvider {
         Notebook nb = getNotebookById(notebookId);
         if (nb == null) return;  // Nếu không tìm thấy notebook, không làm gì cả
 
-            if (nb.getDefault()) {
-                Log.w("DataProvider", "Không thể xóa sổ tay mặc định.");
-                return;  // Dừng lại nếu là notebook mặc định
-            }
-
         // Sử dụng Iterator để tránh ConcurrentModificationException khi xóa
         Iterator<Note> iter = nb.getNotes().iterator();
         while (iter.hasNext()) {
@@ -177,24 +171,9 @@ public class DataProvider {
             }
         }
     }
-    public static void setDefaultNotebook(String notebookId) {
-        for (Notebook notebook : notebooks) {
-            if (notebook.getId().equals(notebookId)) {
-                notebook.setDefault(true);  // Đặt notebook làm mặc định
-            } else {
-                notebook.setDefault(false);  // Đặt tất cả notebook khác là không mặc định
-            }
-        }
-    }
-
 
     // Cập nhật dữ liệu sau khi xóa
     public static void removeNoteFromDataProvider(String notebookId, String noteId, Context context) {
-        Notebook notebook = getNotebookById(notebookId);
-        if (notebook != null && notebook.getDefault()) {
-            Toast.makeText(context, "Không thể xóa ghi chú từ sổ tay mặc định", Toast.LENGTH_SHORT).show();
-            return;  // Không cho phép xóa nếu là sổ tay mặc định
-        }
         removeNoteFromFirebase(notebookId, noteId, context);  // Xóa ghi chú từ Firebase
         removeNoteFromNotebook(notebookId, noteId);  // Xóa ghi chú trong notebook
 
@@ -270,29 +249,4 @@ public class DataProvider {
 
     public static void removeNote(Note note) {
     }
-
-    public static void updateNotebook(Notebook updatedNotebook) {
-        // Step 1: Update the local list of notebooks
-        for (int i = 0; i < notebooks.size(); i++) {
-            if (notebooks.get(i).getId().equals(updatedNotebook.getId())) {
-                notebooks.set(i, updatedNotebook);  // Replace the old notebook with the updated one
-                Log.d("DataProvider", "Updated local notebook with ID: " + updatedNotebook.getId());
-                break;
-            }
-        }
-
-        // Step 2: Update the notebook data in Firebase
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("backup_json");
-
-        // Find the specific notebook and update its values in Firebase
-        userRef.child("notebooks").child(updatedNotebook.getId()).setValue(updatedNotebook)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("DataProvider", "Successfully updated notebook in Firebase.");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("DataProvider", "Failed to update notebook in Firebase: " + e.getMessage());
-                });
-    }
-
 }
